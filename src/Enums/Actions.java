@@ -1,4 +1,4 @@
-package com.example.phoneapp;
+package Enums;
 
 
 public enum Actions 

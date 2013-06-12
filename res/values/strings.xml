@@ -4,5 +4,8 @@
     <string name="app_name">PhoneApp</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_edit_action">EditActionActivity</string>
+    <string name="title_activity_edit_contact">EditContactActivity</string>
 
 </resources>

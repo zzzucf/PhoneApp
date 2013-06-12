@@ -1,4 +1,4 @@
-package com.example.phoneapp;
+package Classes;
 
 public class VoiceRecognizer {
 	// Constructor.
