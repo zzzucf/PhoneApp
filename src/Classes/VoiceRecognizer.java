@@ -1,6 +1,7 @@
 package Classes;
 
-public class VoiceRecognizer {
+public class VoiceRecognizer 
+{
 	// Constructor.
 	public VoiceRecognizer()
 	{

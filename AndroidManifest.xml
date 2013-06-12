@@ -3,7 +3,9 @@
     package="com.example.phoneapp"
     android:versionCode="1"
     android:versionName="1.0" >
-
+	
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+    
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
@@ -33,6 +35,10 @@
         <activity
             android:name="com.example.phoneapp.SettingsActivity"
             android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="com.example.phoneapp.IncomingCallActivity"
+            android:label="@string/title_activity_incoming_call" >
         </activity>
     </application>
 

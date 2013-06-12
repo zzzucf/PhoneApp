@@ -7,5 +7,6 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_edit_action">EditActionActivity</string>
     <string name="title_activity_edit_contact">EditContactActivity</string>
+    <string name="title_activity_incoming_call">IncomingCallActivity</string>
 
 </resources>
