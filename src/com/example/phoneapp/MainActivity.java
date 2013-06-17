@@ -36,6 +36,8 @@ public class MainActivity extends Activity
 	private TextView                textView;
 	private File audiofile = null;
 
+	private String 					logText;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -58,17 +60,26 @@ public class MainActivity extends Activity
 		// Register phone listener.
 		telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);  
 		telephonyManager.listen(new PhoneListener(), PhoneStateListener.LISTEN_CALL_STATE);  
+
+		logText = "";
+		textView = (TextView)findViewById(R.id.MessageBox);
 		
 		outputFileName = Environment.getExternalStorageDirectory() + "/Records/record1.3gp";
 		
-//		try
-//		{
-//			audiofile = File.createTempFile("test", ".3gp", Environment.getExternalStorageDirectory());
-//		} catch (IOException e)
-//		{
-//			Log.e("AudioRecorder", "sdcard access error");
-//			return;
-//		}
+		boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+		
+		Log.v("Sdcard Access", sdcardExist+"");
+		ScreenLog(sdcardExist+"");
+		
+		try
+		{
+			audiofile = File.createTempFile("test", ".3gp", Environment.getExternalStorageDirectory());
+		} 
+		catch (IOException e)
+		{
+			Log.e("AudioRecorder", "sdcard access error");
+			ScreenLog("sdcard asscess error");
+		}
 		
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -76,55 +87,66 @@ public class MainActivity extends Activity
 		
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		
-		recorder.setOutputFile("/sdcard/audio_demo.3gp");
+		recorder.setOutputFile(audiofile.getPath());
 		//recorder.setOutputFile(outputFileName);
 		
 		Log.i("AudioRecorder", "Recorder initializes successfully!");
+		ScreenLog("Recorder initializes successfully!");
 		
-		textView = (TextView)findViewById(R.id.MessageBox);
+		
 	}
 	
 	public void RecordClick(View v)
 	{
 		Log.i("event","Record Click!");
-		textView.setText("Recording");
+		ScreenLog("Recording");
 		
+		// TODO: add if statement to avoid double prepare.
 		try
 		{
 			recorder.prepare();
 			recorder.start();
+			
+			Log.i("AudioRecorder", "Record Start!");
+			ScreenLog("Record start!");
 		}
 		catch (IllegalStateException e)
 		{
-			textView.setText("Failed to prepare.");
 			Log.e("AudioRecorder", e.getMessage());
+			ScreenLog(e.getMessage());
 		}
 		catch (IOException e)
 		{
 			Log.e("AudioRecorder", e.getMessage());
+			ScreenLog(e.getMessage());
 		}
-		
-		Log.i("AudioRecorder", "Record Start!");
 	}
 	
 	public void StopClick(View v)
 	{
 		Log.i("event", "Stop Click!");
+		ScreenLog("Stop Click!");
 		
 		try
 		{
 			recorder.stop();
 			recorder.release();
 			recorder = null;
+			
+			Log.i("AudioRecorder", "Recorder Stop!");
+			ScreenLog("Recorder Stop!");
 		}
 		catch (IllegalStateException e)
 		{
-			textView.setText("Failed to prepare.");
 			Log.e("AudioRecorder", e.getMessage());
+			ScreenLog(e.getMessage());
 		}
-		
-		Log.i("AudioRecorder", "Recorder Stop!");
 	}
 	
+	public void ScreenLog(String text)
+	{
+		logText = logText + text + "\n";
+		textView.setText(logText);
+	}
 	
 }
