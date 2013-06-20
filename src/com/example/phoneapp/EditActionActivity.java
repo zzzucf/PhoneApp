@@ -34,7 +34,6 @@ public class EditActionActivity extends Activity
 		setContentView(R.layout.activity_edit_action);
 
 		initRecorder();
-		initPlayer();
 	}
 
 	@Override
@@ -69,47 +68,6 @@ public class EditActionActivity extends Activity
 		recorder.setOutputFile(audioFile.getPath());
 
 		Log.i("z", "Recorder initializes successfully!");
-	}
-
-	public void initPlayer()
-	{
-		// TODO: If file is empty then we cannot create a media player object.
-		if (audioFile.length() == 0)
-		{
-			Log.e("z", "audio file does not exist.");
-		} else
-		{
-
-			MediaPlayer mediaPlayer = new MediaPlayer();
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-			try
-			{
-				ScreenLog("Audio File path is " + audioFile.getPath());
-				Log.i("z", "Audio File path is " + audioFile.getPath());
-				FileInputStream inputStream = new FileInputStream(audioFile);
-				mediaPlayer.setDataSource(inputStream.getFD());
-
-				ScreenLog("Player initializes successfully!");
-				Log.i("z", "Player initializes successfully!");
-			} catch (IllegalArgumentException e)
-			{
-				ScreenLog(e.getMessage());
-				Log.e("z", e.getMessage());
-			} catch (SecurityException e)
-			{
-				ScreenLog(e.getMessage());
-				Log.e("z", e.getMessage());
-			} catch (IllegalStateException e)
-			{
-				ScreenLog("z" + e.getMessage());
-				Log.e("z", e.getMessage());
-			} catch (IOException e)
-			{
-				ScreenLog(e.getMessage());
-				Log.e("z", e.getMessage());
-			}
-		}
 	}
 
 	public void RecordClick(View v)
@@ -159,25 +117,53 @@ public class EditActionActivity extends Activity
 
 	public void PlayClick(View v)
 	{
-		// TODO: Testing code need to be deleted.
-		initPlayer();
+		if (audioFile.length() == 0)
+		{
+			Log.e("z", "audio file does not exist.");
+		}
+		else if(!audioFile.canRead()) 
+		{
+			Log.e("z", "audio file can not be read.");
+		}
+		else
+		{
+			MediaPlayer mediaPlayer = new MediaPlayer();
+			mediaPlayer.reset();
+			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-		Log.i("z", "Play the save file");
-		try
-		{
-			Log.i("z", "player prepare");
-			mediaPlayer.prepare();
-			
-			Log.i("z", "player start");
-			//mediaPlayer.start();
-		} catch (IllegalStateException e)
-		{
-			//ScreenLog(e.getMessage());
-			Log.e("z", e.getMessage());
-		} catch (IOException e)
-		{
-			//ScreenLog(e.getMessage());
-			Log.e("z", e.getMessage());
+			try
+			{
+				ScreenLog("Audio File path is " + audioFile.getPath());
+				Log.i("z", "Audio File path is " + audioFile.getPath());
+				FileInputStream inputStream = new FileInputStream(audioFile);
+				
+				Log.i("z", "Get FD = "+inputStream.getFD());
+				
+				mediaPlayer.setDataSource(audioFile.getPath());
+				//mediaPlayer.setDataSource(inputStream.getFD());
+				
+				mediaPlayer.prepare();
+				mediaPlayer.start();
+
+				ScreenLog("Player initializes successfully!");
+				Log.i("z", "Player initializes successfully!");
+			} catch (IllegalArgumentException e)
+			{
+				ScreenLog(e.getMessage());
+				Log.e("z", e.getMessage());
+			} catch (SecurityException e)
+			{
+				ScreenLog(e.getMessage());
+				Log.e("z", e.getMessage());
+			} catch (IllegalStateException e)
+			{
+				ScreenLog("z" + e.getMessage());
+				Log.e("z", e.getMessage());
+			} catch (IOException e)
+			{
+				ScreenLog(e.getMessage());
+				Log.e("z", e.getMessage());
+			}
 		}
 	}
 
