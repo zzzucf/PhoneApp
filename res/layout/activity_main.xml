@@ -12,21 +12,14 @@
     <TextView
         android:id="@+id/MessageBox"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:text="@string/hello_world" />
+        android:layout_height="wrap_content"
+        android:text="Main Activity" />
 
-    <Button
-        android:id="@+id/Record"
-        android:layout_width="100dp"
-        android:layout_height="45dp"
-        android:text="Record" 
-        android:onClick="RecordClick"/>
-
-    <Button
-        android:id="@+id/Stop"
-        android:layout_width="100dp"
-        android:layout_height="45dp"
-        android:text="Stop" 
-        android:onClick="StopClick"/>
-
+     <Button
+            android:id="@+id/Action"
+            android:layout_width="250dp"
+            android:layout_height="45dp"
+            android:onClick="ActionClick"
+            android:text="Action List" />
+    
 </LinearLayout>
