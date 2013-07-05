@@ -1,68 +1,58 @@
 package com.example.phoneapp;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import Classes.Response;
-import Classes.Contact;
-import Classes.PhoneListener;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
-import android.content.Context;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.telephony.PhoneStateListener;
+import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.TextView;
 
 public class MainActivity extends Activity
 {
-	// Data.
-	private ArrayList<Response> 	userActions;
-	private ArrayList<Contact> 		userContacts;
+	private PhoneBroadcastReceiver mBroadcastReceiver;
 
-	// Controls.
-	private TelephonyManager 		telephonyManager;
-
-	// Variables.
-	private TextView                textView;
-	private String 					logText;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		// Add fragment to record a audio and play a audio.
+		addActionFragment();
+
+		// Register a broadcastreceiver to receive phone state change event.
+		registerPhoneBroadcastReceiver();
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
+	public void addActionFragment()
 	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		FragmentTransaction transaction = getFragmentManager()
+				.beginTransaction();
+
+		// TODO: Change replace to add and add more action fragment.
+		transaction.replace(R.id.actionFragmentContainer, new ActionFragment());
+		transaction.addToBackStack(null);
+
+		// Commit the transaction
+		transaction.commit();
 	}
 
-	
-	public void ActionClick(View v)
+	public void registerPhoneBroadcastReceiver()
 	{
-		Log.i("z", "Action click");
-		
-		Intent intent = new Intent(this, EditActionActivity.class);
-		startActivity(intent);
+		Log.i("z", "register phone broadcast receiver");
+
+		mBroadcastReceiver = new PhoneBroadcastReceiver();
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+		intentFilter.setPriority(Integer.MAX_VALUE);
+		registerReceiver(mBroadcastReceiver, intentFilter);
 	}
-	
-	public void ScreenLog(String text)
+
+	public void unregisterPhoneBroadcastReceiver()
 	{
-		logText = logText + text + "\n";
-		textView.setText(logText);
+		Log.i("z", "unregisterThis");
+		unregisterReceiver(mBroadcastReceiver);
 	}
-	
 }

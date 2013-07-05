@@ -8,5 +8,6 @@
     <string name="title_activity_edit_action">EditActionActivity</string>
     <string name="title_activity_edit_contact">EditContactActivity</string>
     <string name="title_activity_incoming_call">IncomingCallActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
 
 </resources>

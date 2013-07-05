@@ -12,9 +12,6 @@ public enum Actions
 	// Decline the call.
 	Decline,
 	
-	// Put the call on hold.
-	OnHold,
-	
-	// Response to last coming call.
-	CallBack,
+	// Mute.
+	Mute
 }
