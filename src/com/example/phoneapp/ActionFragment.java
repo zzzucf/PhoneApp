@@ -3,6 +3,7 @@ package com.example.phoneapp;
 import java.io.File;
 import java.io.IOException;
 
+import Enums.ActionEnum;
 import android.app.Fragment;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -13,19 +14,34 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class ActionFragment extends Fragment
 {
-	public String ActionName;
-	public File audioFile;
+	public ActionEnum actionName;
+
+	private File audioFile;
+	private String fileName;
 	private MediaRecorder recorder;
-	private String fileName = "test";
 	private boolean isRecording = false;
+
+	// TODO: Think about how to initialize these properties.
+	public void Initialize(ActionEnum actionName)
+	{
+		// Setup file name.
+		fileName = actionName + "_clip";
+
+		// Setup action name label.
+		TextView actionNameLabel = (TextView) getView().findViewById(
+				R.id.LblActionName);
+		actionNameLabel.setText(fileName);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
 	{
+
 		// Inflate the layout for this fragment
 		return inflater.inflate(R.layout.action_fragment, container, false);
 	}

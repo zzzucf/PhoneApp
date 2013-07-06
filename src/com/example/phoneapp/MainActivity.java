@@ -3,11 +3,9 @@ package com.example.phoneapp;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
 
 public class MainActivity extends Activity
 {
@@ -22,7 +20,7 @@ public class MainActivity extends Activity
 		// Add fragment to record a audio and play a audio.
 		addActionFragment();
 
-		// Register a broadcastreceiver to receive phone state change event.
+		// Register a broadcast receiver to receive phone state change event.
 		registerPhoneBroadcastReceiver();
 	}
 
