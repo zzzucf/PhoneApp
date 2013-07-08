@@ -89,6 +89,7 @@ public class AutoAnswerIntentService extends IntentService
 				answerPhoneHeadsethook(context);
 			}
 		}
+		
 		// Load preferences.
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);

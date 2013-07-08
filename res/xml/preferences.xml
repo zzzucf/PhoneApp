@@ -1,11 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>  
-<PreferenceScreen   
-    xmlns:android="http://schemas.android.com/apk/res/android"   
-    android:title="Settings">  
-    <CheckBoxPreference   
-        android:title="True or false"   
-        android:summaryOn="True!"  
-        android:summaryOff="False."  
-        android:defaultValue="true">  
-    </CheckBoxPreference>  
-</PreferenceScreen>  
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings" >
+
+    <CheckBoxPreference android:title="Enable" />
+
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/listArray"
+        android:entryValues="@array/listValues"
+        android:key="Language"
+        android:summary="Select the language for display and voice recognition"
+        android:title="Language" />
+    
+</PreferenceScreen>

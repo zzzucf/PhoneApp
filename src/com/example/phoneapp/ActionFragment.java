@@ -13,8 +13,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 @SuppressLint("ValidFragment")
@@ -30,7 +33,7 @@ public class ActionFragment extends Fragment
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
-		
+
 		this.actionName = actionName;
 		this.fileName = actionName + "_clip";
 	}
@@ -44,65 +47,97 @@ public class ActionFragment extends Fragment
 		// Setup action name label.
 		TextView actionNameLabel = (TextView) v
 				.findViewById(R.id.LblActionName);
-		actionNameLabel.setText(actionName+"");
-		// Inflate the layout for this fragment
+		actionNameLabel.setText(actionName + "");
+
+		// Setup button on touch event.
+		Button button = (Button) v.findViewById(R.id.BtnRecord);
+		button.setOnTouchListener(new OnTouchListener()
+		{
+			public boolean onTouch(View v, MotionEvent event)
+			{
+				switch (event.getAction())
+				{
+					case MotionEvent.ACTION_DOWN:
+					{
+						Log.i("z", "key down");
+						
+						Button btnRecord = (Button) v
+								.findViewById(R.id.BtnRecord);
+						btnRecord.setText("@string/label_stop");
+						
+						startRecording();
+						break;
+					}
+					case MotionEvent.ACTION_UP:
+					{
+						Log.i("z", "key up");
+						
+						Button btnRecord = (Button) v
+								.findViewById(R.id.BtnRecord);
+						btnRecord.setText("@string/label_record");
+						
+						stopRecording();
+						break;
+					}
+				}
+				return true;
+			}
+		});
+
 		return v;
 	}
 
-	public void RecordClick(View v)
+	public void startRecording()
 	{
-		Log.i("z", "Record click");
+		Log.i("z", "Record");
 
-		if (!isRecording)
+		// If sdcard exists.
+		boolean sdcardExist = Environment.getExternalStorageState().equals(
+				android.os.Environment.MEDIA_MOUNTED);
+		Log.v("sdcard Access", sdcardExist + "");
+
+		// Create new file in sd card.
+		try
 		{
-			// If sdcard exists.
-			boolean sdcardExist = Environment.getExternalStorageState().equals(
-					android.os.Environment.MEDIA_MOUNTED);
-			Log.v("sdcard Access", sdcardExist + "");
+			audioFile = File.createTempFile(fileName, ".3gp",
+					Environment.getExternalStorageDirectory());
+		} catch (IOException e)
+		{
+			Log.e("z", "sdcard access error");
+		}
 
-			// Create new file in sd card.
-			try
-			{
-				audioFile = File.createTempFile(fileName, ".3gp",
-						Environment.getExternalStorageDirectory());
-			} catch (IOException e)
-			{
-				Log.e("z", "sdcard access error");
-			}
+		// Create new recorder.
+		recorder = new MediaRecorder();
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		recorder.setOutputFile(audioFile.getPath());
 
-			// Create new recorder.
-			recorder = new MediaRecorder();
-			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-			recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-			recorder.setOutputFile(audioFile.getPath());
+		Log.i("z", "Recorder initializes successfully!");
 
-			Log.i("z", "Recorder initializes successfully!");
+		try
+		{
+			Log.i("z", "Recorder prepare!");
+			recorder.prepare();
 
-			try
-			{
-				Log.i("z", "Recorder prepare!");
-				recorder.prepare();
+			Log.i("z", "Recorder Start!");
+			recorder.start();
 
-				Log.i("z", "Recorder Start!");
-				recorder.start();
-
-				isRecording = true;
-			} catch (IllegalStateException e)
-			{
-				Log.e("z", e.getMessage());
-			} catch (IOException e)
-			{
-				Log.e("z", e.getMessage());
-			}
+			isRecording = true;
+		} catch (IllegalStateException e)
+		{
+			Log.e("z", e.getMessage());
+		} catch (IOException e)
+		{
+			Log.e("z", e.getMessage());
 		}
 	}
 
-	public void StopClick(View v)
+	public void stopRecording()
 	{
-		Log.i("z", "Stop click!");
+		Log.i("z", "stop recording");
 
-		if (recorder != null && isRecording)
+		if (recorder != null)
 		{
 			try
 			{
@@ -121,7 +156,10 @@ public class ActionFragment extends Fragment
 
 	public void PlayClick(View v)
 	{
-		if (audioFile.length() == 0)
+		if (audioFile == null)
+		{
+
+		} else if (audioFile.length() == 0)
 		{
 			Log.e("z", "audio file does not exist.");
 		} else if (!audioFile.canRead())

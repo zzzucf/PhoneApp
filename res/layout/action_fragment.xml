@@ -11,26 +11,25 @@
         android:layout_alignBaseline="@+id/BtnRecord"
         android:layout_alignBottom="@+id/BtnRecord"
         android:layout_alignParentLeft="true"
-        android:text="@string/label_action_name"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:text="@string/label_action_name" />
 
     <Button
         android:id="@+id/BtnPlay"
-        style="@style/AppBaseTheme"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:onClick="PlayClick"
-        android:text="@string/label_play" />
+        android:text="@string/label_play"
+        android:textSize="10sp" />
 
     <Button
         android:id="@+id/BtnRecord"
-        style="@style/AppBaseTheme"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/BtnPlay"
-        android:text="@string/label_record" />
+        android:text="@string/label_record"
+        android:textSize="10sp" />
 
 </RelativeLayout>

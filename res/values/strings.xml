@@ -3,8 +3,8 @@
 
     <string name="app_name">PhoneApp</string>
     <string name="label_action_name">Action</string>
-    <string name="label_record">Record</string>
-    <string name="label_stop">Stop</string>
+    <string name="label_record">Hold to talk</string>
+    <string name="label_stop">Release to send</string>
     <string name="label_play">Play</string>
 
 </resources>
