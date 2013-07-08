@@ -1,5 +1,6 @@
 package com.example.phoneapp;
 
+import Enums.ActionEnum;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentTransaction;
@@ -18,22 +19,24 @@ public class MainActivity extends Activity
 		setContentView(R.layout.activity_main);
 
 		// Add fragment to record a audio and play a audio.
-		addActionFragment();
+		addActionFragment(ActionEnum.Answer);
+		addActionFragment(ActionEnum.Decline);
+		addActionFragment(ActionEnum.Mute);
 
 		// Register a broadcast receiver to receive phone state change event.
 		registerPhoneBroadcastReceiver();
 	}
 
-	public void addActionFragment()
+	public void addActionFragment(ActionEnum action)
 	{
 		FragmentTransaction transaction = getFragmentManager()
 				.beginTransaction();
 
-		// TODO: Change replace to add and add more action fragment.
-		transaction.replace(R.id.actionFragmentContainer, new ActionFragment());
+		// Add the transaction.
+		transaction.add(R.id.actionFragmentContainer, new ActionFragment(action));
 		transaction.addToBackStack(null);
 
-		// Commit the transaction
+		// Commit the transaction.
 		transaction.commit();
 	}
 
@@ -41,16 +44,29 @@ public class MainActivity extends Activity
 	{
 		Log.i("z", "register phone broadcast receiver");
 
-		mBroadcastReceiver = new PhoneBroadcastReceiver();
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-		intentFilter.setPriority(Integer.MAX_VALUE);
-		registerReceiver(mBroadcastReceiver, intentFilter);
+		try
+		{
+			mBroadcastReceiver = new PhoneBroadcastReceiver();
+			IntentFilter intentFilter = new IntentFilter();
+			intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
+			intentFilter.setPriority(Integer.MAX_VALUE);
+			registerReceiver(mBroadcastReceiver, intentFilter);
+		} catch (Exception e)
+		{
+			Log.e("z", e.toString());
+		}
 	}
 
 	public void unregisterPhoneBroadcastReceiver()
 	{
-		Log.i("z", "unregisterThis");
-		unregisterReceiver(mBroadcastReceiver);
+		Log.i("z", "unregister phone broadcast receiver");
+
+		try
+		{
+			unregisterReceiver(mBroadcastReceiver);
+		} catch (Exception e)
+		{
+			Log.e("z", e.toString());
+		}
 	}
 }

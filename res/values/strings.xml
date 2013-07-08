@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">PhoneApp</string>
-    <string name="label_action_name">Action Name</string>
+    <string name="label_action_name">Action</string>
     <string name="label_record">Record</string>
     <string name="label_stop">Stop</string>
     <string name="label_play">Play</string>

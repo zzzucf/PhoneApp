@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import Enums.ActionEnum;
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -16,34 +17,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+@SuppressLint("ValidFragment")
 public class ActionFragment extends Fragment
 {
-	public ActionEnum actionName;
-
+	private ActionEnum actionName;
 	private File audioFile;
 	private String fileName;
 	private MediaRecorder recorder;
 	private boolean isRecording = false;
 
-	// TODO: Think about how to initialize these properties.
-	public void Initialize(ActionEnum actionName)
+	// TODO: Check why this code need SupressLint.
+	public ActionFragment(ActionEnum actionName)
 	{
-		// Setup file name.
-		fileName = actionName + "_clip";
-
-		// Setup action name label.
-		TextView actionNameLabel = (TextView) getView().findViewById(
-				R.id.LblActionName);
-		actionNameLabel.setText(fileName);
+		super();
+		
+		this.actionName = actionName;
+		this.fileName = actionName + "_clip";
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
 	{
+		View v = inflater.inflate(R.layout.action_fragment, container, false);
 
+		// Setup action name label.
+		TextView actionNameLabel = (TextView) v
+				.findViewById(R.id.LblActionName);
+		actionNameLabel.setText(actionName+"");
 		// Inflate the layout for this fragment
-		return inflater.inflate(R.layout.action_fragment, container, false);
+		return v;
 	}
 
 	public void RecordClick(View v)

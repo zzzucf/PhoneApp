@@ -125,13 +125,12 @@ public class AutoAnswerIntentService extends IntentService
 				"android.permission.CALL_PRIVILEGED");
 	}
 
-	@SuppressWarnings("unchecked")
 	private void answerPhoneAidl(Context context) throws Exception
 	{
 		// Set up communication with the telephony service (thanks to Tedd's
 		// Droid Tools!)
 		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		Class c = Class.forName(tm.getClass().getName());
+		Class<?> c = Class.forName(tm.getClass().getName());
 		Method m = c.getDeclaredMethod("getITelephony");
 		m.setAccessible(true);
 		ITelephony telephonyService;
