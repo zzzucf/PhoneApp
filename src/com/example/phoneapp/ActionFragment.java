@@ -19,6 +19,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import java.lang.Runnable;
 
 @SuppressLint("ValidFragment")
 public class ActionFragment extends Fragment
@@ -27,15 +28,43 @@ public class ActionFragment extends Fragment
 	private File audioFile;
 	private String fileName;
 	private MediaRecorder recorder;
-	private boolean isRecording = false;
+	private Thread startRecordingThread;
+	private Thread endRecordingThread;
+	private Thread playRecordThread;
 
-	// TODO: Check why this code need SupressLint.
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
 
 		this.actionName = actionName;
 		this.fileName = actionName + "_clip";
+
+		startRecordingThread = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				startRecording();
+			}
+		});
+
+		endRecordingThread = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				stopRecording();
+			}
+		});
+
+		playRecordThread = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				playRecord();
+			}
+		});
 	}
 
 	@Override
@@ -49,38 +78,59 @@ public class ActionFragment extends Fragment
 				.findViewById(R.id.LblActionName);
 		actionNameLabel.setText(actionName + "");
 
-		// Setup button on touch event.
-		Button button = (Button) v.findViewById(R.id.BtnRecord);
-		button.setOnTouchListener(new OnTouchListener()
+		// Setup button onTouch event.
+		Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
+		btnRecord.setOnTouchListener(new OnTouchListener()
 		{
 			public boolean onTouch(View v, MotionEvent event)
 			{
 				switch (event.getAction())
 				{
-					case MotionEvent.ACTION_DOWN:
+				case MotionEvent.ACTION_DOWN:
+				{
+					Log.i("z", "key down");
+
+					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
+					btnRecord.setText(R.string.label_stop);
+
+					if (!startRecordingThread.isAlive())
 					{
-						Log.i("z", "key down");
-						
-						Button btnRecord = (Button) v
-								.findViewById(R.id.BtnRecord);
-						btnRecord.setText("@string/label_stop");
-						
-						startRecording();
-						break;
+						recorder = null;
+						startRecordingThread.start();
 					}
-					case MotionEvent.ACTION_UP:
-					{
-						Log.i("z", "key up");
-						
-						Button btnRecord = (Button) v
-								.findViewById(R.id.BtnRecord);
-						btnRecord.setText("@string/label_record");
-						
-						stopRecording();
-						break;
-					}
+
+					break;
 				}
+				case MotionEvent.ACTION_UP:
+				{
+					Log.i("z", "key up");
+
+					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
+					btnRecord.setText(R.string.label_record);
+
+					if (!endRecordingThread.isAlive())
+					{
+						endRecordingThread.start();
+					}
+					break;
+				}
+				}
+				
 				return true;
+			}
+		});
+
+		// Setup button onClick event.
+		Button btnPlay = (Button) v.findViewById(R.id.BtnPlay);
+		btnPlay.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				if (!playRecordThread.isAlive())
+				{
+					playRecordThread.start();
+				}
 			}
 		});
 
@@ -89,18 +139,20 @@ public class ActionFragment extends Fragment
 
 	public void startRecording()
 	{
-		Log.i("z", "Record");
-
 		// If sdcard exists.
 		boolean sdcardExist = Environment.getExternalStorageState().equals(
 				android.os.Environment.MEDIA_MOUNTED);
 		Log.v("sdcard Access", sdcardExist + "");
 
 		// Create new file in sd card.
+
 		try
 		{
-			audioFile = File.createTempFile(fileName, ".3gp",
-					Environment.getExternalStorageDirectory());
+			if (audioFile == null)
+			{
+				audioFile = File.createTempFile(fileName, ".3gp",
+						Environment.getExternalStorageDirectory());
+			}
 		} catch (IOException e)
 		{
 			Log.e("z", "sdcard access error");
@@ -114,6 +166,7 @@ public class ActionFragment extends Fragment
 		recorder.setOutputFile(audioFile.getPath());
 
 		Log.i("z", "Recorder initializes successfully!");
+		Log.i("z", "start recording");
 
 		try
 		{
@@ -123,7 +176,6 @@ public class ActionFragment extends Fragment
 			Log.i("z", "Recorder Start!");
 			recorder.start();
 
-			isRecording = true;
 		} catch (IllegalStateException e)
 		{
 			Log.e("z", e.getMessage());
@@ -154,11 +206,13 @@ public class ActionFragment extends Fragment
 		}
 	}
 
-	public void PlayClick(View v)
+	public void playRecord()
 	{
+		Log.i("z", "play");
+
 		if (audioFile == null)
 		{
-
+			Log.i("z", "audio file has not been created yet.");
 		} else if (audioFile.length() == 0)
 		{
 			Log.e("z", "audio file does not exist.");

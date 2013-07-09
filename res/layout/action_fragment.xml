@@ -19,7 +19,6 @@
         android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:onClick="PlayClick"
         android:text="@string/label_play"
         android:textSize="10sp" />
 

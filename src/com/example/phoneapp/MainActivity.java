@@ -1,16 +1,23 @@
 package com.example.phoneapp;
 
+import java.io.File;
+import java.io.IOException;
+
 import Enums.ActionEnum;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 
 public class MainActivity extends Activity
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
+	private File audioFile;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -69,4 +76,6 @@ public class MainActivity extends Activity
 			Log.e("z", e.toString());
 		}
 	}
+	
+	
 }
