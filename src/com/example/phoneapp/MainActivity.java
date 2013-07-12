@@ -1,20 +1,12 @@
 package com.example.phoneapp;
 
-import java.io.File;
-import java.io.IOException;
-
 import Enums.ActionEnum;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
 
 public class MainActivity extends Activity
 {
@@ -78,38 +70,12 @@ public class MainActivity extends Activity
 			Log.e("z", e.toString());
 		}
 	}
-
-	private File audioFile;
-	private MediaRecorder recorder;
-
-	public void RecordClick(View v) throws IOException
-	{
-		audioFile = FileManager.createAudioFile("test", "VoiceAnswerCall");
-
-		recorder = new MediaRecorder();
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		recorder.setOutputFile(audioFile.getPath());
-
-		recorder.prepare();
-		recorder.start();
-	}
-
-	public void StopClick(View v)
-	{
-		if (recorder != null)
-		{
-			recorder.stop();
-			recorder.release();
-		}
-	}
-
-	@Override
+	
+	@Override 
 	public void onDestroy()
 	{
 		super.onDestroy();
-		System.out.println("OnDestroy");
-		recorder.release();
+		
+		unregisterPhoneBroadcastReceiver();
 	}
 }

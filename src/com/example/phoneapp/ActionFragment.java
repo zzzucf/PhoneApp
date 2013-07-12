@@ -18,7 +18,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import java.lang.Runnable;
 
 @SuppressLint("ValidFragment")
 public class ActionFragment extends Fragment
@@ -26,10 +25,7 @@ public class ActionFragment extends Fragment
 	private ActionEnum actionName;
 	private File audioFile;
 	private String fileName;
-
 	private MediaRecorder recorder;
-
-	private Thread playRecordThread;
 
 	public ActionFragment(ActionEnum actionName)
 	{
@@ -37,7 +33,6 @@ public class ActionFragment extends Fragment
 
 		this.actionName = actionName;
 		this.fileName = actionName + "_clip";
-		this.initThread();
 	}
 
 	@Override
@@ -66,14 +61,7 @@ public class ActionFragment extends Fragment
 					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
 					btnRecord.setText(R.string.label_stop);
 
-					try
-					{
-						Record();
-					} catch (IOException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					Record();
 					break;
 				}
 				case MotionEvent.ACTION_UP:
@@ -99,31 +87,23 @@ public class ActionFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				if (!playRecordThread.isAlive())
-				{
-					playRecordThread.start();
-				}
+				playRecord();
 			}
 		});
 
 		return v;
 	}
 
-	public void initThread()
+	public void Record()
 	{
-		playRecordThread = new Thread(new Runnable()
+		try
 		{
-			@Override
-			public void run()
-			{
-				playRecord();
-			}
-		});
-	}
-
-	public void Record() throws IOException
-	{
-		audioFile = FileManager.createAudioFile(fileName, "VoiceAnswerCall");
+			audioFile = FileManager.createAudioFile(fileName, "VoiceAnswerCall");
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -131,7 +111,20 @@ public class ActionFragment extends Fragment
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		recorder.setOutputFile(audioFile.getPath());
 
-		recorder.prepare();
+		try
+		{
+			recorder.prepare();
+			
+		} catch (IllegalStateException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		recorder.start();
 	}
 
@@ -144,7 +137,7 @@ public class ActionFragment extends Fragment
 		}
 	}
 
-	public void playRecord()
+	public void playRecord() 
 	{
 		Log.i("z", "play");
 
@@ -159,26 +152,28 @@ public class ActionFragment extends Fragment
 
 			try
 			{
-				Log.v("z", "Audio File path is " + audioFile.getPath());
-
 				mediaPlayer.setDataSource(audioFile.getPath());
 				mediaPlayer.prepare();
-				mediaPlayer.start();
-
-				Log.i("z", "Player initializes successfully!");
+			
 			} catch (IllegalArgumentException e)
 			{
-				Log.e("z", e.getMessage());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (SecurityException e)
 			{
-				Log.e("z", e.getMessage());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IllegalStateException e)
 			{
-				Log.e("z", e.getMessage());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (IOException e)
 			{
-				Log.e("z", e.getMessage());
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+			mediaPlayer.start();
 		}
 	}
 
@@ -187,6 +182,11 @@ public class ActionFragment extends Fragment
 	{
 		super.onDestroy();
 
-		recorder.release();
+		if (recorder != null)
+		{
+			recorder.release();
+			recorder = null;
+		}
+		
 	}
 }
