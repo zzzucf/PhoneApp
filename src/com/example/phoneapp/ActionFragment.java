@@ -10,7 +10,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -27,9 +26,9 @@ public class ActionFragment extends Fragment
 	private ActionEnum actionName;
 	private File audioFile;
 	private String fileName;
+
 	private MediaRecorder recorder;
-	private Thread startRecordingThread;
-	private Thread endRecordingThread;
+
 	private Thread playRecordThread;
 
 	public ActionFragment(ActionEnum actionName)
@@ -38,33 +37,7 @@ public class ActionFragment extends Fragment
 
 		this.actionName = actionName;
 		this.fileName = actionName + "_clip";
-
-		startRecordingThread = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				startRecording();
-			}
-		});
-
-		endRecordingThread = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				stopRecording();
-			}
-		});
-
-		playRecordThread = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				playRecord();
-			}
-		});
+		this.initThread();
 	}
 
 	@Override
@@ -93,12 +66,14 @@ public class ActionFragment extends Fragment
 					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
 					btnRecord.setText(R.string.label_stop);
 
-					if (!startRecordingThread.isAlive())
+					try
 					{
-						recorder = null;
-						startRecordingThread.start();
+						Record();
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-
 					break;
 				}
 				case MotionEvent.ACTION_UP:
@@ -108,14 +83,11 @@ public class ActionFragment extends Fragment
 					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
 					btnRecord.setText(R.string.label_record);
 
-					if (!endRecordingThread.isAlive())
-					{
-						endRecordingThread.start();
-					}
+					Stop();
 					break;
 				}
 				}
-				
+
 				return true;
 			}
 		});
@@ -137,72 +109,38 @@ public class ActionFragment extends Fragment
 		return v;
 	}
 
-	public void startRecording()
+	public void initThread()
 	{
-		// If sdcard exists.
-		boolean sdcardExist = Environment.getExternalStorageState().equals(
-				android.os.Environment.MEDIA_MOUNTED);
-		Log.v("sdcard Access", sdcardExist + "");
-
-		// Create new file in sd card.
-
-		try
+		playRecordThread = new Thread(new Runnable()
 		{
-			if (audioFile == null)
+			@Override
+			public void run()
 			{
-				audioFile = File.createTempFile(fileName, ".3gp",
-						Environment.getExternalStorageDirectory());
+				playRecord();
 			}
-		} catch (IOException e)
-		{
-			Log.e("z", "sdcard access error");
-		}
+		});
+	}
 
-		// Create new recorder.
+	public void Record() throws IOException
+	{
+		audioFile = FileManager.createAudioFile(fileName, "VoiceAnswerCall");
+
 		recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		recorder.setOutputFile(audioFile.getPath());
 
-		Log.i("z", "Recorder initializes successfully!");
-		Log.i("z", "start recording");
-
-		try
-		{
-			Log.i("z", "Recorder prepare!");
-			recorder.prepare();
-
-			Log.i("z", "Recorder Start!");
-			recorder.start();
-
-		} catch (IllegalStateException e)
-		{
-			Log.e("z", e.getMessage());
-		} catch (IOException e)
-		{
-			Log.e("z", e.getMessage());
-		}
+		recorder.prepare();
+		recorder.start();
 	}
 
-	public void stopRecording()
+	public void Stop()
 	{
-		Log.i("z", "stop recording");
-
 		if (recorder != null)
 		{
-			try
-			{
-				Log.i("z", "Stop!");
-				recorder.stop();
-
-				Log.i("z", "Release!");
-				recorder.release();
-				recorder = null;
-			} catch (IllegalStateException e)
-			{
-				Log.e("z", e.getMessage());
-			}
+			recorder.stop();
+			recorder.release();
 		}
 	}
 
@@ -213,12 +151,6 @@ public class ActionFragment extends Fragment
 		if (audioFile == null)
 		{
 			Log.i("z", "audio file has not been created yet.");
-		} else if (audioFile.length() == 0)
-		{
-			Log.e("z", "audio file does not exist.");
-		} else if (!audioFile.canRead())
-		{
-			Log.e("z", "audio file can not be read.");
 		} else
 		{
 			MediaPlayer mediaPlayer = new MediaPlayer();
@@ -248,5 +180,13 @@ public class ActionFragment extends Fragment
 				Log.e("z", e.getMessage());
 			}
 		}
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+
+		recorder.release();
 	}
 }

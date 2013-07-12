@@ -6,7 +6,9 @@ import java.io.IOException;
 import Enums.ActionEnum;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.IntentFilter;
@@ -17,7 +19,6 @@ import android.view.View;
 public class MainActivity extends Activity
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
-	private File audioFile;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -40,7 +41,8 @@ public class MainActivity extends Activity
 				.beginTransaction();
 
 		// Add the transaction.
-		transaction.add(R.id.actionFragmentContainer, new ActionFragment(action));
+		transaction.add(R.id.actionFragmentContainer,
+				new ActionFragment(action));
 		transaction.addToBackStack(null);
 
 		// Commit the transaction.
@@ -76,6 +78,38 @@ public class MainActivity extends Activity
 			Log.e("z", e.toString());
 		}
 	}
-	
-	
+
+	private File audioFile;
+	private MediaRecorder recorder;
+
+	public void RecordClick(View v) throws IOException
+	{
+		audioFile = FileManager.createAudioFile("test", "VoiceAnswerCall");
+
+		recorder = new MediaRecorder();
+		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		recorder.setOutputFile(audioFile.getPath());
+
+		recorder.prepare();
+		recorder.start();
+	}
+
+	public void StopClick(View v)
+	{
+		if (recorder != null)
+		{
+			recorder.stop();
+			recorder.release();
+		}
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		System.out.println("OnDestroy");
+		recorder.release();
+	}
 }
