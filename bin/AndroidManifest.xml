@@ -37,6 +37,7 @@
         </activity>
 
         <service android:name="com.example.phoneapp.AutoAnswerIntentService" />
+        <service android:name="com.example.phoneapp.TTSIntentService" />
     </application>
 
 </manifest>

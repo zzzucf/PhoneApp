@@ -36,6 +36,7 @@
 package com.example.phoneapp;
 
 import java.lang.reflect.Method;
+
 import com.android.internal.telephony.ITelephony;
 import android.app.IntentService;
 import android.content.Context;
@@ -49,18 +50,16 @@ import android.view.KeyEvent;
 
 public class AutoAnswerIntentService extends IntentService
 {
-
 	public AutoAnswerIntentService()
 	{
 		super("AutoAnswerIntentService");
-
-		Log.i("z", "intent service constructor");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		Log.i("z", "intent service init");
+		Log.i("z", "start auto answer intent service");
+		
 		Context context = getBaseContext();
 
 		// Make sure the phone is still ringing
@@ -70,8 +69,6 @@ public class AutoAnswerIntentService extends IntentService
 		{
 			return;
 		}
-
-		// TODO: Read the contact name using TTS.
 
 		// TODO: Recognize voice command.
 		boolean answer = true;
@@ -89,16 +86,16 @@ public class AutoAnswerIntentService extends IntentService
 				answerPhoneHeadsethook(context);
 			}
 		}
-		
+
 		// Load preferences.
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
-
 		// Enable the speaker.
 		if (prefs.getBoolean("use_speakerphone", false))
 		{
 			enableSpeakerPhone(context);
 		}
+
 		return;
 	}
 
@@ -140,5 +137,11 @@ public class AutoAnswerIntentService extends IntentService
 		// Silence the ringer and answer the call!
 		telephonyService.silenceRinger();
 		telephonyService.answerRingingCall();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
 	}
 }

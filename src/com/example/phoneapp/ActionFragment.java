@@ -98,11 +98,11 @@ public class ActionFragment extends Fragment
 	{
 		try
 		{
-			audioFile = FileManager.createAudioFile(fileName, "VoiceAnswerCall");
+			audioFile = FileManager
+					.createAudioFile(fileName, "VoiceAnswerCall");
 		} catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("z", e.getMessage());
 		}
 
 		recorder = new MediaRecorder();
@@ -114,17 +114,15 @@ public class ActionFragment extends Fragment
 		try
 		{
 			recorder.prepare();
-			
+
 		} catch (IllegalStateException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("z", e.getMessage());
 		} catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e("z", e.getMessage());
 		}
-		
+
 		recorder.start();
 	}
 
@@ -137,7 +135,7 @@ public class ActionFragment extends Fragment
 		}
 	}
 
-	public void playRecord() 
+	public void playRecord()
 	{
 		Log.i("z", "play");
 
@@ -154,25 +152,21 @@ public class ActionFragment extends Fragment
 			{
 				mediaPlayer.setDataSource(audioFile.getPath());
 				mediaPlayer.prepare();
-			
+
 			} catch (IllegalArgumentException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("z", e.getMessage());
 			} catch (SecurityException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("z", e.getMessage());
 			} catch (IllegalStateException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("z", e.getMessage());
 			} catch (IOException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("z", e.getMessage());
 			}
-			
+
 			mediaPlayer.start();
 		}
 	}
@@ -187,6 +181,5 @@ public class ActionFragment extends Fragment
 			recorder.release();
 			recorder = null;
 		}
-		
 	}
 }

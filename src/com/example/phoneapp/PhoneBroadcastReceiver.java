@@ -24,13 +24,8 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver
 				.getDefaultSharedPreferences(context);
 
 		// Check phone state
-		String phone_state = intent
-				.getStringExtra(TelephonyManager.EXTRA_STATE);
-		Log.i("z", phone_state + "");
-
-		String number = intent
-				.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-		Log.i("z", number + "");
+		String phone_state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+		String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 		if (phone_state.equals(TelephonyManager.EXTRA_STATE_RINGING))
 		{
@@ -59,13 +54,13 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver
 				}
 			}
 
-			// Call a service, since this could take a few seconds
+			// Start tts service.
+			Intent ttsIntent = new Intent(context, TTSIntentService.class);
+			ttsIntent.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER, number);
+			context.startService(ttsIntent);
 
-			Log.i("z", "start intent service");
-
-			context.startService(new Intent(context,
-					AutoAnswerIntentService.class));
-			Log.i("z", "service started");
+			// Start autoAnswerIntentService.
+			context.startService(new Intent(context, AutoAnswerIntentService.class));
 		}
 	}
 

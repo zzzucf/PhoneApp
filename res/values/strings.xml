@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">PhoneApp</string>
+    <string name="app_name">AnswerThePhoneWithVoice</string>
     <string name="label_action_name">Action</string>
     <string name="label_record">Hold to talk</string>
     <string name="label_stop">Release to send</string>

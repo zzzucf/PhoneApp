@@ -2,7 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings" >
 
-    <CheckBoxPreference android:title="Enable" />
+    <CheckBoxPreference 
+        android:key="Enable"
+        android:title="Enable" />
 
     <ListPreference
         android:defaultValue="1"
