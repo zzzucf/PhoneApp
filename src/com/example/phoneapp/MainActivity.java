@@ -110,7 +110,7 @@ public class MainActivity extends Activity
 			moveTaskToBack(true);
 			return true;
 		}
-		
+
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -119,8 +119,7 @@ public class MainActivity extends Activity
 		Log.i("z", "");
 		Context context = getApplicationContext();
 		Intent ttsIntent = new Intent(context, TTSIntentService.class);
-		ttsIntent
-				.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER, "4076835923");
+		ttsIntent.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER, "4076835923");
 		context.startService(ttsIntent);
 	}
 
