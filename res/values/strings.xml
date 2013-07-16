@@ -6,5 +6,11 @@
     <string name="label_record">Hold to talk</string>
     <string name="label_stop">Release to send</string>
     <string name="label_play">Play</string>
+    <string name="label_enable">Enable</string>
+    <string name="label_language">Language</string>
 
+    <string name="key_enable">Enable</string>
+    <string name="key_language">Language</string>
+    
+    <string name="summary_language">Select the language for display and voice recognition</string>
 </resources>

@@ -1,18 +1,23 @@
 package com.example.phoneapp;
 
+import java.util.Locale;
+
 import Enums.ActionEnum;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Configuration;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
-public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
+public class MainActivity extends Activity implements
+		OnSharedPreferenceChangeListener
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
 
@@ -20,31 +25,33 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
 
 		// Add fragment to record a audio and play a audio.
 		addActionFragment(ActionEnum.Answer);
 		addActionFragment(ActionEnum.Decline);
 		addActionFragment(ActionEnum.Mute);
+		
+		setContentView(R.layout.activity_main);
 
 		// Register a broadcast receiver to receive phone state change event.
 		registerPhoneBroadcastReceiver();
-		
-		// Register a listener to apply preference change. 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+
+		// Register a listener to apply preference change.
+		SharedPreferences sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
-	
+
 	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+			String key)
 	{
-		if (key.equals("Enable"))
+		if (key == getString(R.string.key_enable))
 		{
-			Log.i("z", "Enable change");
-		}
-		else if (key.equals("Language"))
+			onEnableChange(sharedPreferences);
+		} else if (key == getString(R.string.key_language))
 		{
-			Log.i("z", "Language change");
+			onLanguageChange(sharedPreferences);
 		}
 	}
 
@@ -67,7 +74,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 		unregisterPhoneBroadcastReceiver();
 	}
-	
+
 	public void addActionFragment(ActionEnum action)
 	{
 		FragmentTransaction transaction = getFragmentManager()
@@ -106,5 +113,42 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		{
 			Log.e("z", e.toString());
 		}
+	}
+
+	public void onEnableChange(SharedPreferences sharedPreferences)
+	{
+		if (sharedPreferences.getBoolean(getString(R.string.key_enable), true))
+		{
+			registerPhoneBroadcastReceiver();
+		} else
+		{
+			unregisterPhoneBroadcastReceiver();
+		}
+	}
+
+	public void onLanguageChange(SharedPreferences sharedPreferences)
+	{
+		String language = sharedPreferences.getString(getString(R.string.key_language), "");
+		Configuration config = getResources().getConfiguration();
+		
+		if (language.toString().equals("Cn"))
+		{
+			config.locale = Locale.CHINESE;
+		}
+		else if (language.toString().equals("En"))
+		{
+			config.locale = Locale.ENGLISH;
+		}
+
+		getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+		
+		restartActivity();
+	}
+
+	public void restartActivity()
+	{
+		Intent intent = getIntent();
+		finish();
+		startActivity(intent);
 	}
 }

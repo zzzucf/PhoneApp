@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">软件名</string>
+    <string name="label_action_name">动作</string>
+    <string name="label_record">按下录音</string>
+    <string name="label_stop">松开结束</string>
+    <string name="label_play">播放</string>
+   	<string name="label_enable">启用</string>	
+    <string name="label_language">语言</string>
+
+    <string name="key_enable">Enable</string>
+    <string name="key_language">Language</string>
+    
+    <string name="summary_language">选择显示和语音识别语言</string>
+</resources>

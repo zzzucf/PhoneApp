@@ -6,8 +6,8 @@
         <item>简体中文</item>
     </string-array>
     <string-array name="listValues">
-        <item>1</item>
-        <item>2</item>
+        <item>En</item>
+        <item>Cn</item>
     </string-array>
 
 </resources>
