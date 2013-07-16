@@ -24,8 +24,6 @@ public class TTSIntentService extends IntentService implements OnInitListener
 	@Override
 	protected void onHandleIntent(Intent intent)
 	{
-		Log.i("z", "start tts intent service");
-		
 		Context context = getApplicationContext();
 
 		number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
