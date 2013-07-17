@@ -41,9 +41,6 @@ import com.android.internal.telephony.ITelephony;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.media.AudioManager;
-import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -87,23 +84,7 @@ public class AutoAnswerIntentService extends IntentService
 			}
 		}
 
-		// Load preferences.
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		// Enable the speaker.
-		if (prefs.getBoolean("use_speakerphone", false))
-		{
-			enableSpeakerPhone(context);
-		}
-
 		return;
-	}
-
-	private void enableSpeakerPhone(Context context)
-	{
-		AudioManager audioManager = (AudioManager) context
-				.getSystemService(Context.AUDIO_SERVICE);
-		audioManager.setSpeakerphoneOn(true);
 	}
 
 	private void answerPhoneHeadsethook(Context context)

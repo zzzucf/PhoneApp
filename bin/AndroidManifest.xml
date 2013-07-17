@@ -8,18 +8,13 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.RECORD_AUDIO" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.STORAGE" >
-    </uses-permission>
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.STORAGE" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+     <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <application
         android:allowBackup="true"
@@ -37,7 +32,7 @@
         </activity>
 
         <service android:name="com.example.phoneapp.AutoAnswerIntentService" />
-        <service android:name="com.example.phoneapp.TTSIntentService" />
+        <service android:name="com.example.phoneapp.TTSService" />
     </application>
 
 </manifest>
