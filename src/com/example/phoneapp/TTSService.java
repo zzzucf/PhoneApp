@@ -117,8 +117,6 @@ public class TTSService extends Service implements OnInitListener
 	{
 		if (status == TextToSpeech.SUCCESS)
 		{
-			Log.i("z", "OnInit tts " + tts);
-			
 			// TODO: Read the language from share preference.
 			int result = tts.setLanguage(Locale.US);
 
@@ -131,7 +129,8 @@ public class TTSService extends Service implements OnInitListener
 				enableSpeaker();
 				speak("Calling from " + contactName + numberToString(number));
 			}
-		} else
+		} 
+		else
 		{
 			Log.e("TTS", "Initilization Failed!");
 		}

@@ -16,8 +16,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
-public class MainActivity extends Activity implements
-		OnSharedPreferenceChangeListener
+public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
 
@@ -37,8 +36,7 @@ public class MainActivity extends Activity implements
 		registerPhoneBroadcastReceiver();
 
 		// Register a listener to apply preference change.
-		SharedPreferences sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
 
@@ -49,7 +47,8 @@ public class MainActivity extends Activity implements
 		if (key == getString(R.string.key_enable))
 		{
 			onEnableChange(sharedPreferences);
-		} else if (key == getString(R.string.key_language))
+		} 
+		else if (key == getString(R.string.key_language))
 		{
 			onLanguageChange(sharedPreferences);
 		}
@@ -77,12 +76,10 @@ public class MainActivity extends Activity implements
 
 	public void addActionFragment(ActionEnum action)
 	{
-		FragmentTransaction transaction = getFragmentManager()
-				.beginTransaction();
+		FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
 		// Add the transaction.
-		transaction.add(R.id.actionFragmentContainer,
-				new ActionFragment(action));
+		transaction.add(R.id.actionFragmentContainer, new ActionFragment(action));
 		transaction.addToBackStack(null);
 
 		// Commit the transaction.
@@ -98,7 +95,8 @@ public class MainActivity extends Activity implements
 			intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 			intentFilter.setPriority(Integer.MAX_VALUE);
 			registerReceiver(mBroadcastReceiver, intentFilter);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			Log.e("z", e.toString());
 		}
@@ -109,7 +107,8 @@ public class MainActivity extends Activity implements
 		try
 		{
 			unregisterReceiver(mBroadcastReceiver);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			Log.e("z", e.toString());
 		}
@@ -120,7 +119,8 @@ public class MainActivity extends Activity implements
 		if (sharedPreferences.getBoolean(getString(R.string.key_enable), true))
 		{
 			registerPhoneBroadcastReceiver();
-		} else
+		} 
+		else
 		{
 			unregisterPhoneBroadcastReceiver();
 		}

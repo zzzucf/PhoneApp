@@ -56,7 +56,7 @@ public class AutoAnswerIntentService extends IntentService
 	protected void onHandleIntent(Intent intent)
 	{
 		Log.i("z", "start auto answer intent service");
-		
+
 		Context context = getBaseContext();
 
 		// Make sure the phone is still ringing
@@ -67,7 +67,10 @@ public class AutoAnswerIntentService extends IntentService
 			return;
 		}
 
-		// TODO: Recognize voice command.
+		// TODO: Get audioRecorder setup and running. Try predict the voice.
+		int result = svm_predict.predict();
+		Log.i("z", "predict result = " + result);
+		
 		boolean answer = true;
 		if (answer)
 		{
@@ -87,6 +90,7 @@ public class AutoAnswerIntentService extends IntentService
 		return;
 	}
 
+	// TODO: Clean up this code.
 	private void answerPhoneHeadsethook(Context context)
 	{
 		// Simulate a press of the headset button to pick up the call
@@ -106,8 +110,6 @@ public class AutoAnswerIntentService extends IntentService
 
 	private void answerPhoneAidl(Context context) throws Exception
 	{
-		// Set up communication with the telephony service (thanks to Tedd's
-		// Droid Tools!)
 		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
 		Class<?> c = Class.forName(tm.getClass().getName());
 		Method m = c.getDeclaredMethod("getITelephony");
@@ -118,11 +120,5 @@ public class AutoAnswerIntentService extends IntentService
 		// Silence the ringer and answer the call!
 		telephonyService.silenceRinger();
 		telephonyService.answerRingingCall();
-	}
-
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
 	}
 }
