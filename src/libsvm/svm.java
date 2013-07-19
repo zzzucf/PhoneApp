@@ -2747,9 +2747,6 @@ public class svm
 		while (true)
 		{
 			String cmd = fp.readLine();
-			
-			Log.i("z", "cmd " + cmd);
-			
 			String arg = cmd.substring(cmd.indexOf(' ') + 1);
 
 			if (cmd.startsWith("svm_type"))
@@ -2846,25 +2843,42 @@ public class svm
 		model.sv_coef = new double[m][l];
 		model.SV = new svm_node[l][];
 
-		Log.i("z", "read sv " + l);
+		String output = "";
 		
 		for (int i = 0; i < l; i++)
 		{
-			Log.i("z", "i = " + i);
+			Log.i("z", "i = "+ i);
+			
 			String line = fp.readLine();
 			StringTokenizer st = new StringTokenizer(line, " \t\n\r\f:");
-
+			
+			
 			for (int k = 0; k < m; k++)
+			{
 				model.sv_coef[k][i] = atof(st.nextToken());
+			}
+			
+			
 			int n = st.countTokens() / 2;
+			
+			//output += "{ ";
+			//int index = 1;
 			model.SV[i] = new svm_node[n];
 			for (int j = 0; j < n; j++)
 			{
 				model.SV[i][j] = new svm_node();
 				model.SV[i][j].index = atoi(st.nextToken());
 				model.SV[i][j].value = atof(st.nextToken());
+				
+				//output += "svm_node node" + index + " = new svm_node();";
+				//output += "node" + index + ".index = " + model.SV[i][j].index + ";";
+				//output += "node" + index + ".value = " + model.SV[i][j].value + ";";
+				//index++;
 			}
+			//output +="}, ";
 		}
+		
+		Log.i("z", output);
 
 		fp.close();
 		return model;

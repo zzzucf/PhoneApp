@@ -11,30 +11,48 @@ import android.util.Log;
 
 class SvmRecognizer
 {
-	public static int nr_class;
-	public static svm_model model = null;
+	public static int classes;
+	public static svm_model model;
 	public static svm_node[] nodes;
-
-	public static void init(BufferedReader reader)
+	private static SvmRecognizer instance;
+	
+	private SvmRecognizer()
 	{
-		// m is the feature vector dimension
-		int dimemsion = 312;
-
+		// Make the constructor private and use the singleton method.
+	}
+	
+	public static SvmRecognizer getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new SvmRecognizer();
+		}
+		
+		return instance;
+	}
+	
+	public boolean init(BufferedReader reader)
+	{
+		final int dimemsion = 312; // dimension for feature vector.
+		
 		// Get model
+		model = null;
 		try
 		{
-			// TODO: Cannot load the file here. Try to fix it.
-			Log.i("z", "try to load model");
-			model = svm.svm_load_model(reader);
-		} catch (IOException e)
+			model = svm.svm_load_model(reader); 
+		} 
+		catch (IOException e)
 		{
-			Log.e("z", e.getMessage());
+			Log.e("z", "Fail to load model.");
 		}
 
-		Log.i("z", "model = " + model);
+		if (model == null)
+		{
+			return false;
+		}
 		
 		// Get all classes.
-		nr_class = svm.svm_get_nr_class(model);
+		classes = svm.svm_get_nr_class(model);
 
 		// Get all nodes.
 		nodes = new svm_node[dimemsion];
@@ -45,29 +63,27 @@ class SvmRecognizer
 			nodes[index].index = index;
 			nodes[index].value = 0.5;
 		}
+
+		return true;
 	}
 
-	public static double predict()
+	public double predict()
 	{
 		// TODO: Add comments here.
-		double[] prob_estimates = null;
-
-		// TODO: Add comments here.
-		prob_estimates = new double[nr_class];
+		double[] prob_estimates = new double[classes];
 		Log.i("z", "prob_estimates = " + prob_estimates);
 
-		double label;
-		label = svm.svm_predict_probability(model, nodes, prob_estimates);
+		double label = svm.svm_predict_probability(model, nodes, prob_estimates);
 		Log.i("z", "label = " + label);
+
+		double estimateValue = Math.max(
+				Math.max(prob_estimates[0], prob_estimates[1]),
+				prob_estimates[2]);
 		
-		double estimateValue = Math.max(Math.max(prob_estimates[0], 
-												 prob_estimates[1]),	
-												 prob_estimates[2]);
 		Log.i("z", "prob_estimates[0] = " + prob_estimates[0]);
 		Log.i("z", "prob_estimates[1] = " + prob_estimates[1]);
 		Log.i("z", "prob_estimates[2] = " + prob_estimates[2]);
-		
-		
+
 		return estimateValue;
 	}
 }

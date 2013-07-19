@@ -168,14 +168,15 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		Log.i("z", "reader = " + reader);
 		Log.i("z", "start predicting");
 		
+		// Init svm with a separate thread.
 		new Thread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
 				// TODO Auto-generated method stub
-				SvmRecognizer.init(reader);
-				Log.i("z", "class = " + SvmRecognizer.nr_class);
+				SvmRecognizer.getInstance().init(reader);
+				Log.i("z", "class = " + SvmRecognizer.classes);
 				Log.i("z", "nodes = " + SvmRecognizer.nodes);
 				Log.i("z", "model = " + SvmRecognizer.model);
 			}
@@ -186,6 +187,6 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	public void predict(View v)
 	{
 		Log.i("z", "onclick");
-		SvmRecognizer.predict();
+		SvmRecognizer.getInstance().predict();
 	}
 }
