@@ -35,6 +35,11 @@
 
 package com.example.phoneapp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 
 import com.android.internal.telephony.ITelephony;
@@ -68,8 +73,7 @@ public class AutoAnswerIntentService extends IntentService
 		}
 
 		// TODO: Get audioRecorder setup and running. Try predict the voice.
-		int result = svm_predict.predict();
-		Log.i("z", "predict result = " + result);
+		// TODO: Use audio source to predict what kind of voice command it is.
 		
 		boolean answer = true;
 		if (answer)

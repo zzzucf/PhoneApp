@@ -1,5 +1,8 @@
 package com.example.phoneapp;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import Enums.ActionEnum;
@@ -15,6 +18,7 @@ import android.content.res.Configuration;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
 {
@@ -25,6 +29,9 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	{
 		super.onCreate(savedInstanceState);
 
+		// Init svm
+		initSvm();
+		
 		// Add fragment to record a audio and play a audio.
 		addActionFragment(ActionEnum.Answer);
 		addActionFragment(ActionEnum.Decline);
@@ -150,5 +157,35 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
+	}
+	
+	// TODO: Change svm to service.
+	public void initSvm()
+	{
+		InputStream inputStream = getResources().openRawResource(R.raw.svm3);
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		
+		Log.i("z", "reader = " + reader);
+		Log.i("z", "start predicting");
+		
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				// TODO Auto-generated method stub
+				SvmRecognizer.init(reader);
+				Log.i("z", "class = " + SvmRecognizer.nr_class);
+				Log.i("z", "nodes = " + SvmRecognizer.nodes);
+				Log.i("z", "model = " + SvmRecognizer.model);
+			}
+		}
+		).start();
+	}
+	
+	public void predict(View v)
+	{
+		Log.i("z", "onclick");
+		SvmRecognizer.predict();
 	}
 }

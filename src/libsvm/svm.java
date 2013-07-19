@@ -3,6 +3,8 @@ package libsvm;
 import java.io.*;
 import java.util.*;
 
+import android.util.Log;
+
 //
 // Kernel Cache
 //
@@ -2745,6 +2747,9 @@ public class svm
 		while (true)
 		{
 			String cmd = fp.readLine();
+			
+			Log.i("z", "cmd " + cmd);
+			
 			String arg = cmd.substring(cmd.indexOf(' ') + 1);
 
 			if (cmd.startsWith("svm_type"))
@@ -2841,8 +2846,11 @@ public class svm
 		model.sv_coef = new double[m][l];
 		model.SV = new svm_node[l][];
 
+		Log.i("z", "read sv " + l);
+		
 		for (int i = 0; i < l; i++)
 		{
+			Log.i("z", "i = " + i);
 			String line = fp.readLine();
 			StringTokenizer st = new StringTokenizer(line, " \t\n\r\f:");
 
