@@ -20,7 +20,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
-public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
+public class MainActivity extends Activity implements
+		OnSharedPreferenceChangeListener
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
 
@@ -30,21 +31,39 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		super.onCreate(savedInstanceState);
 
 		// Init svm
-		initSvm();
-		
+		//initSvm();
+
 		// Add fragment to record a audio and play a audio.
 		addActionFragment(ActionEnum.Answer);
 		addActionFragment(ActionEnum.Decline);
 		addActionFragment(ActionEnum.Mute);
-		
+
 		setContentView(R.layout.activity_main);
 
 		// Register a broadcast receiver to receive phone state change event.
 		registerPhoneBroadcastReceiver();
 
 		// Register a listener to apply preference change.
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+	}
+
+	private Locale locale;
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig)
+	{
+		super.onConfigurationChanged(newConfig);
+		
+		Log.i("z", "config change");
+//		if (locale != null)
+//		{
+//			newConfig.locale = locale;
+//			Locale.setDefault(locale);
+//			getBaseContext().getResources().updateConfiguration(newConfig,
+//					getBaseContext().getResources().getDisplayMetrics());
+//		}
 	}
 
 	@Override
@@ -54,8 +73,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		if (key == getString(R.string.key_enable))
 		{
 			onEnableChange(sharedPreferences);
-		} 
-		else if (key == getString(R.string.key_language))
+		} else if (key == getString(R.string.key_language))
 		{
 			onLanguageChange(sharedPreferences);
 		}
@@ -83,10 +101,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 	public void addActionFragment(ActionEnum action)
 	{
-		FragmentTransaction transaction = getFragmentManager().beginTransaction();
+		FragmentTransaction transaction = getFragmentManager()
+				.beginTransaction();
 
 		// Add the transaction.
-		transaction.add(R.id.actionFragmentContainer, new ActionFragment(action));
+		transaction.add(R.id.actionFragmentContainer,
+				new ActionFragment(action));
 		transaction.addToBackStack(null);
 
 		// Commit the transaction.
@@ -102,8 +122,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			intentFilter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 			intentFilter.setPriority(Integer.MAX_VALUE);
 			registerReceiver(mBroadcastReceiver, intentFilter);
-		} 
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			Log.e("z", e.toString());
 		}
@@ -114,8 +133,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		try
 		{
 			unregisterReceiver(mBroadcastReceiver);
-		} 
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			Log.e("z", e.toString());
 		}
@@ -126,8 +144,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		if (sharedPreferences.getBoolean(getString(R.string.key_enable), true))
 		{
 			registerPhoneBroadcastReceiver();
-		} 
-		else
+		} else
 		{
 			unregisterPhoneBroadcastReceiver();
 		}
@@ -135,20 +152,21 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 	public void onLanguageChange(SharedPreferences sharedPreferences)
 	{
-		String language = sharedPreferences.getString(getString(R.string.key_language), "");
+		String language = sharedPreferences.getString(
+				getString(R.string.key_language), "");
 		Configuration config = getResources().getConfiguration();
-		
+
 		if (language.toString().equals("Cn"))
 		{
 			config.locale = Locale.CHINESE;
-		}
-		else if (language.toString().equals("En"))
+		} else if (language.toString().equals("En"))
 		{
 			config.locale = Locale.ENGLISH;
 		}
 
-		getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-		
+		getResources().updateConfiguration(config,
+				getResources().getDisplayMetrics());
+
 		restartActivity();
 	}
 
@@ -158,16 +176,17 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		finish();
 		startActivity(intent);
 	}
-	
+
 	// TODO: Change svm to service.
 	public void initSvm()
 	{
 		InputStream inputStream = getResources().openRawResource(R.raw.svm3);
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-		
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(
+				inputStream));
+
 		Log.i("z", "reader = " + reader);
 		Log.i("z", "start predicting");
-		
+
 		// Init svm with a separate thread.
 		new Thread(new Runnable()
 		{
@@ -180,10 +199,10 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 				Log.i("z", "nodes = " + SvmRecognizer.nodes);
 				Log.i("z", "model = " + SvmRecognizer.model);
 			}
-		}
-		).start();
+		}).start();
 	}
-	
+
+	// TODO: Testing buttons.
 	public void predict(View v)
 	{
 		Log.i("z", "onclick");

@@ -19,6 +19,9 @@ class SvmRecognizer
 	private SvmRecognizer()
 	{
 		// Make the constructor private and use the singleton method.
+		classes = -1;
+		model = null;
+		nodes = null;
 	}
 	
 	public static SvmRecognizer getInstance()
@@ -33,10 +36,10 @@ class SvmRecognizer
 	
 	public boolean init(BufferedReader reader)
 	{
-		final int dimemsion = 312; // dimension for feature vector.
+		// dimension for feature vector.
+		final int dimemsion = 312; 
 		
 		// Get model
-		model = null;
 		try
 		{
 			model = svm.svm_load_model(reader); 
@@ -69,13 +72,18 @@ class SvmRecognizer
 
 	public double predict()
 	{
-		// TODO: Add comments here.
+		if (model == null || nodes == null || classes == -1)
+		{
+			return -1;
+		}
+		
+		// TODO: Add comments here. 
 		double[] prob_estimates = new double[classes];
-		Log.i("z", "prob_estimates = " + prob_estimates);
 
+		// TODO: Add comments here.
 		double label = svm.svm_predict_probability(model, nodes, prob_estimates);
-		Log.i("z", "label = " + label);
 
+		// TODO: Add comments here.
 		double estimateValue = Math.max(
 				Math.max(prob_estimates[0], prob_estimates[1]),
 				prob_estimates[2]);
