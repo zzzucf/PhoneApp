@@ -6,8 +6,10 @@ import java.io.IOException;
 import Enums.ActionEnum;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.media.AudioFormat;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.media.AudioRecord;
+import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,15 +26,48 @@ public class ActionFragment extends Fragment
 {
 	private ActionEnum actionName;
 	private File audioFile;
-	private String fileName;
+	private String audiofileName;
+	private String featureFileName;
 	private MediaRecorder recorder;
+
+	boolean isRecording = false;// 是否录放的标记
+	static final int frequency = 44100;
+	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+	int recBufSize, playBufSize;
+	AudioRecord audioRecord;
+	AudioTrack audioTrack;
+
+	// TODO: Test code.
+	private AudioRecorderManager manager;
 
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
 
 		this.actionName = actionName;
-		this.fileName = actionName + "_clip";
+		this.audiofileName = actionName + "_clip";
+		this.featureFileName = actionName + "_feature";
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		recBufSize = AudioRecord.getMinBufferSize(frequency,
+				channelConfiguration, audioEncoding);
+
+		playBufSize = AudioTrack.getMinBufferSize(frequency,
+				channelConfiguration, audioEncoding);
+		// -----------------------------------------
+		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
+				channelConfiguration, audioEncoding, recBufSize);
+
+		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
+				channelConfiguration, audioEncoding, playBufSize,
+				AudioTrack.MODE_STREAM);
+		// ------------------------------------------
+		audioTrack.setStereoVolume(0.7f, 0.7f);// 设置当前音量大小
 	}
 
 	@Override
@@ -98,88 +133,40 @@ public class ActionFragment extends Fragment
 	{
 		try
 		{
-			audioFile = FileManager
-					.createAudioFile(fileName, "VoiceAnswerCall");
+			audioFile = FileManager.createAudioFile(audiofileName,
+					"VoiceAnswerCall");
 		} catch (IOException e)
 		{
 			Log.e("z", e.getMessage());
 		}
 
-		recorder = new MediaRecorder();
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		recorder.setOutputFile(audioFile.getPath());
+		byte[] buffer = new byte[recBufSize];
+		audioRecord.startRecording();// 开始录制
+		audioTrack.play();// 开始播放
 
-		try
+		while (isRecording)
 		{
-			recorder.prepare();
+			// 从MIC保存数据到缓冲区
+			int bufferReadResult = audioRecord.read(buffer, 0,
+					recBufSize);
 
-		} catch (IllegalStateException e)
-		{
-			Log.e("z", e.getMessage());
-		} catch (IOException e)
-		{
-			Log.e("z", e.getMessage());
+			byte[] tmpBuf = new byte[bufferReadResult];
+			System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
+			// 写入数据即播放
+			audioTrack.write(tmpBuf, 0, tmpBuf.length);
 		}
-
-		recorder.start();
+		
+		audioTrack.stop();
+		audioRecord.stop();
 	}
 
 	public void Stop()
 	{
-		if (recorder != null)
-		{
-			recorder.stop();
-			recorder.release();
-		}
 	}
 
 	public void playRecord()
 	{
-		Log.i("z", "play");
-
-		if (audioFile == null)
-		{
-			Log.i("z", "audio file has not been created yet.");
-		} else
-		{
-			MediaPlayer mediaPlayer = new MediaPlayer();
-			mediaPlayer.reset();
-			mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-			try
-			{
-				mediaPlayer.setDataSource(audioFile.getPath());
-				mediaPlayer.prepare();
-
-			} catch (IllegalArgumentException e)
-			{
-				Log.e("z", e.getMessage());
-			} catch (SecurityException e)
-			{
-				Log.e("z", e.getMessage());
-			} catch (IllegalStateException e)
-			{
-				Log.e("z", e.getMessage());
-			} catch (IOException e)
-			{
-				Log.e("z", e.getMessage());
-			}
-
-			mediaPlayer.start();
-		}
-	}
-
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-
-		if (recorder != null)
-		{
-			recorder.release();
-			recorder = null;
-		}
+		isRecording = true;
+		new RecordPlayThread().start();
 	}
 }

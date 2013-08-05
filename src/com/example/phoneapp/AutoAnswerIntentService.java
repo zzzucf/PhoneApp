@@ -35,19 +35,15 @@
 
 package com.example.phoneapp;
 
-import java.lang.reflect.Method;
-
-import com.android.internal.telephony.ITelephony;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioRecord;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.KeyEvent;
 
-public class AutoAnswerIntentService extends IntentService
+public class AutoAnswerIntentService extends TelephonyIntentService
 {
+	private int MAXIMUMTRIES = 5;
+
 	public AutoAnswerIntentService()
 	{
 		super("AutoAnswerIntentService");
@@ -60,7 +56,7 @@ public class AutoAnswerIntentService extends IntentService
 
 		Context context = getBaseContext();
 
-		// Make sure the phone is still ringing
+		// If the phone is not ringing then return.
 		TelephonyManager tm = (TelephonyManager) context
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		if (tm.getCallState() != TelephonyManager.CALL_STATE_RINGING)
@@ -68,11 +64,10 @@ public class AutoAnswerIntentService extends IntentService
 			return;
 		}
 
-		// TODO: Get audioRecorder setup and running. Try predict the voice.
-		// TODO: Use audio source to predict what kind of voice command it is.
-		
-		boolean answer = true;
-		if (answer)
+		// Try matching the file.
+		int result = tryMatchResult();
+
+		if (result == -1)
 		{
 			// Answer the phone
 			try
@@ -80,45 +75,44 @@ public class AutoAnswerIntentService extends IntentService
 				answerPhoneAidl(context);
 			} catch (Exception e)
 			{
-				e.printStackTrace();
-				Log.d("AutoAnswer",
-						"Error trying to answer using telephony service.  Falling back to headset.");
 				answerPhoneHeadsethook(context);
 			}
+		}
+		else if (result == 1)
+		{
+			// 
+		}
+		else if (result == 2)
+		{
+			endPhoneCall(context);
 		}
 
 		return;
 	}
 
-	// TODO: Clean up this code.
-	private void answerPhoneHeadsethook(Context context)
+	private int tryMatchResult()
 	{
-		// Simulate a press of the headset button to pick up the call
-		Intent buttonDown = new Intent(Intent.ACTION_MEDIA_BUTTON);
-		buttonDown.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
-				KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
-		context.sendOrderedBroadcast(buttonDown,
-				"android.permission.CALL_PRIVILEGED");
+		AudioMatchingManager manager = new AudioMatchingManager();
 
-		// froyo and beyond trigger on buttonUp instead of buttonDown
-		Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
-		buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(
-				KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
-		context.sendOrderedBroadcast(buttonUp,
-				"android.permission.CALL_PRIVILEGED");
+		for (int i = 0; i < MAXIMUMTRIES; ++i)
+		{
+			Log.i("z", "try match!");
+			if (manager.match() != -1)
+			{
+				return manager.match();
+			}
+
+			try
+			{
+				Thread.sleep(1000);
+			} catch (InterruptedException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+
+		return -1;
 	}
 
-	private void answerPhoneAidl(Context context) throws Exception
-	{
-		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		Class<?> c = Class.forName(tm.getClass().getName());
-		Method m = c.getDeclaredMethod("getITelephony");
-		m.setAccessible(true);
-		ITelephony telephonyService;
-		telephonyService = (ITelephony) m.invoke(tm);
-
-		// Silence the ringer and answer the call!
-		telephonyService.silenceRinger();
-		telephonyService.answerRingingCall();
-	}
 }
