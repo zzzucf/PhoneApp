@@ -6,11 +6,6 @@ import java.io.IOException;
 import Enums.ActionEnum;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioRecord;
-import android.media.AudioTrack;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,17 +23,7 @@ public class ActionFragment extends Fragment
 	private File audioFile;
 	private String audiofileName;
 	private String featureFileName;
-	private MediaRecorder recorder;
 
-	boolean isRecording = false;// 是否录放的标记
-	static final int frequency = 44100;
-	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-	int recBufSize, playBufSize;
-	AudioRecord audioRecord;
-	AudioTrack audioTrack;
-
-	// TODO: Test code.
 	private AudioRecorderManager manager;
 
 	public ActionFragment(ActionEnum actionName)
@@ -54,20 +39,8 @@ public class ActionFragment extends Fragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		recBufSize = AudioRecord.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
-
-		playBufSize = AudioTrack.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
-		// -----------------------------------------
-		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
-				channelConfiguration, audioEncoding, recBufSize);
-
-		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
-				channelConfiguration, audioEncoding, playBufSize,
-				AudioTrack.MODE_STREAM);
-		// ------------------------------------------
-		audioTrack.setStereoVolume(0.7f, 0.7f);// 设置当前音量大小
+		
+		manager = new AudioRecorderManager();
 	}
 
 	@Override
@@ -131,42 +104,25 @@ public class ActionFragment extends Fragment
 
 	public void Record()
 	{
-		try
-		{
-			audioFile = FileManager.createAudioFile(audiofileName,
-					"VoiceAnswerCall");
-		} catch (IOException e)
-		{
-			Log.e("z", e.getMessage());
-		}
+//		try
+//		{
+//			audioFile = FileManager.createAudioFile(audiofileName,
+//					"VoiceAnswerCall");
+//		} catch (IOException e)
+//		{
+//			Log.e("z", e.getMessage());
+//		}
 
-		byte[] buffer = new byte[recBufSize];
-		audioRecord.startRecording();// 开始录制
-		audioTrack.play();// 开始播放
-
-		while (isRecording)
-		{
-			// 从MIC保存数据到缓冲区
-			int bufferReadResult = audioRecord.read(buffer, 0,
-					recBufSize);
-
-			byte[] tmpBuf = new byte[bufferReadResult];
-			System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
-			// 写入数据即播放
-			audioTrack.write(tmpBuf, 0, tmpBuf.length);
-		}
-		
-		audioTrack.stop();
-		audioRecord.stop();
+		manager.startAudioRecorder();
 	}
 
 	public void Stop()
 	{
+		manager.stopAudioRecorder();
 	}
 
 	public void playRecord()
 	{
-		isRecording = true;
-		new RecordPlayThread().start();
+		manager.playAudioTrack();
 	}
 }

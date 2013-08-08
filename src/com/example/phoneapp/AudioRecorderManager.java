@@ -13,61 +13,103 @@ import android.util.Log;
 
 public class AudioRecorderManager
 {
-	static final int frequency = 44100;
+	static final int frequency = 8000;
 	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+
+	int recBufSize;
+	int playBufSize;
+	static final int bufferFactor = 50;
+
 	private AudioRecord audioRecord = null;
 	private AudioTrack audioTrack = null;
-
-	int recBufSize, playBufSize;
+	private byte[] buffer = null;
 
 	public AudioRecorderManager()
 	{
-		recBufSize = AudioRecord.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
+		recBufSize = bufferFactor
+				* AudioRecord.getMinBufferSize(frequency, channelConfiguration,
+						audioEncoding);
 
-		playBufSize = AudioTrack.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
+		playBufSize = bufferFactor
+				* AudioTrack.getMinBufferSize(frequency, channelConfiguration,
+						audioEncoding);
 
-		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency,
-				channelConfiguration, audioEncoding, recBufSize);
+		if (audioRecord == null)
+		{
+			audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+					frequency, channelConfiguration, audioEncoding, recBufSize);
+		}
 
-		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
-				channelConfiguration, audioEncoding, playBufSize,
-				AudioTrack.MODE_STREAM);
+		if (audioTrack == null)
+		{
+			audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency,
+					channelConfiguration, audioEncoding, playBufSize,
+					AudioTrack.MODE_STREAM);
+		}
 
 		audioTrack.setStereoVolume(0.7f, 0.7f);
 	}
 
 	public void startAudioRecorder()
 	{
-		byte[] buffer = new byte[recBufSize];
-		audioRecord.startRecording();// 开始录制
-		audioTrack.play();// 开始播放
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED)
+				{
+					buffer = new byte[recBufSize];
+					
+					audioRecord.startRecording();
+					Log.i("z","start = " + audioRecord.getRecordingState());
 
-		// 从MIC保存数据到缓冲区
-		int bufferReadResult = audioRecord.read(buffer, 0, recBufSize);
+					int bufferReadResult = audioRecord.read(buffer, 0,
+							recBufSize);
 
-		byte[] tmpBuf = new byte[bufferReadResult];
-		System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
-		// 写入数据即播放
-		audioTrack.write(tmpBuf, 0, tmpBuf.length);
-		
-		audioTrack.stop();
-		audioRecord.stop();
+					Log.i("z", "buffer length = " + buffer.length);
+				}
+			}
+		}).start();
 	}
 
 	public void stopAudioRecorder()
 	{
-//		if (audioRecord != null)
-//		{
-//			audioRecord.stop();
-//			audioRecord.release();
-//			audioRecord = null;
-//		}
+		if (audioRecord != null
+				&& audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING)
+		{
+			audioRecord.stop();
+			Log.i("z", "stop = " + audioRecord.getRecordingState());
+		}
 	}
 
-	public void saveAudioFile(byte[] buffer, String filePath)
+	public void playAudioTrack()
+	{
+		if (buffer == null)
+		{
+			Log.i("z", "There is no buffer to be played.");
+			return;
+		}
+
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				Log.i("z", "Start playing audio track.");
+
+				audioTrack.flush();
+				audioTrack.play();
+				audioTrack.write(buffer, 0, buffer.length);
+				audioTrack.stop();
+				
+				Log.i("z", "Stop playing audio track.");
+			}
+		}).start();
+	}
+
+	public void saveAudioFile(String filePath)
 	{
 		FileOutputStream outputFile = null;
 
@@ -92,37 +134,20 @@ public class AudioRecorderManager
 		}
 	}
 
-	public void playAudioTrack(byte[] data)
+	public void destory()
 	{
-		
-	}
-
-	public byte[] getAudioData()
-	{
-		if (audioRecord == null)
+		if (audioRecord != null)
 		{
-			return null;
+			audioRecord.stop();
+			audioRecord.release();
+			audioRecord = null;
 		}
 
-		short buffer[] = new short[recBufSize];
-		int bufferReadResult = audioRecord.read(buffer, 0, recBufSize);
-
-		byte[] tmpBuf = new byte[bufferReadResult];
-		System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
-		return tmpBuf;
-	}
-
-	private byte[] short2byte(short[] sData)
-	{
-		int shortArrsize = sData.length;
-		byte[] bytes = new byte[shortArrsize * 2];
-		for (int i = 0; i < shortArrsize; i++)
+		if (audioTrack != null)
 		{
-			bytes[i * 2] = (byte) (sData[i] & 0x00FF);
-			bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
-			sData[i] = 0;
+			audioTrack.stop();
+			audioTrack.release();
+			audioTrack = null;
 		}
-
-		return bytes;
 	}
 }
