@@ -24,6 +24,7 @@ public class AudioRecorderManager
 	AudioRecord audioRecord = null;
 	AudioTrack audioTrack = null;
 
+	boolean isRecording = false;
 	byte[] buffer = null;
 
 	public AudioRecorderManager()
@@ -37,7 +38,7 @@ public class AudioRecorderManager
 		Log.i("z", "play buffer size" + playBufferSize);
 
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recordBufferSize);
-
+		
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufferSize, AudioTrack.MODE_STREAM);
 
 		audioTrack.setStereoVolume(0.7f, 0.7f);
@@ -51,7 +52,12 @@ public class AudioRecorderManager
 			public void run()
 			{
 				Log.i("z", "start audio record = " + audioRecord);
+				isRecording = true;
 				audioRecord.startRecording();
+				while (isRecording)
+				{
+					updateBuffer();
+				}
 			}
 
 		}).start();
@@ -65,7 +71,7 @@ public class AudioRecorderManager
 			public void run()
 			{
 				Log.i("z", "stop audio record = " + audioRecord);
-				updateBuffer();
+				isRecording = false;
 				audioRecord.stop();
 			}
 		}).start();
@@ -98,6 +104,7 @@ public class AudioRecorderManager
 		audioTrack.flush();
 		audioTrack.play();
 		audioTrack.write(buffer, 0, buffer.length);
+		Log.i("z", "play audio track");
 		audioTrack.stop();
 	}
 

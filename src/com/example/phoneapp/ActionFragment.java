@@ -103,4 +103,12 @@ public class ActionFragment extends Fragment
 
 		return v;
 	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		
+		manager.Destory();
+	}
 }
