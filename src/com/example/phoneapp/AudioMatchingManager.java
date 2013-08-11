@@ -8,7 +8,7 @@ public class AudioMatchingManager
 	
 	public AudioMatchingManager()
 	{
-		AudioRecorderManager manager = new AudioRecorderManager();
+		
 	}
 	
 	public int match()

@@ -23,8 +23,6 @@ public class ActionFragment extends Fragment
 	private String audiofileName;
 	private String featureFileName;
 
-	private AudioRecorderManager manager;
-
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
@@ -39,7 +37,6 @@ public class ActionFragment extends Fragment
 	{
 		super.onCreate(savedInstanceState);
 
-		manager = new AudioRecorderManager();
 		Log.i("z", "manager init.");
 	}
 
@@ -70,7 +67,7 @@ public class ActionFragment extends Fragment
 								.findViewById(R.id.BtnRecord);
 						btnRecord.setText(R.string.label_stop);
 
-						manager.startAudioRecorder();
+						AudioRecorderManager.getInstance().startAudioRecorder();
 						break;
 					}
 					case MotionEvent.ACTION_UP:
@@ -81,7 +78,8 @@ public class ActionFragment extends Fragment
 								.findViewById(R.id.BtnRecord);
 						btnRecord.setText(R.string.label_record);
 
-						manager.stopAudioRecorder();
+						AudioRecorderManager.getInstance().stopAudioRecorder();
+						AudioRecorderManager.getInstance().saveVectorToFile(featureFileName);
 						break;
 					}
 				}
@@ -97,7 +95,7 @@ public class ActionFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				manager.playAudioRecord();
+				AudioRecorderManager.getInstance().playAudioRecord();
 			}
 		});
 
@@ -109,6 +107,6 @@ public class ActionFragment extends Fragment
 	{
 		super.onDestroy();
 		
-		manager.Destory();
+		AudioRecorderManager.getInstance().Destory();
 	}
 }

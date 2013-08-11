@@ -1,8 +1,14 @@
 package com.example.phoneapp;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.mfcc.MFCC;
 
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -13,35 +19,46 @@ import android.util.Log;
 
 public class AudioRecorderManager
 {
-	static final int frequency = 44100;
+	static final int frequency = 8000;
 	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 
 	final int recordBufferSize;
 	final int playBufferSize;
-	final int sizeFactor = 50;
+	final int totalSeconds = 5;
 
 	AudioRecord audioRecord = null;
 	AudioTrack audioTrack = null;
 
-	boolean isRecording = false;
-	byte[] buffer = null;
+	short[] buffer = null;
 
-	public AudioRecorderManager()
+	static AudioRecorderManager instance;
+
+	private AudioRecorderManager()
 	{
-		recordBufferSize = sizeFactor * AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
+		recordBufferSize = totalSeconds * frequency;
 
 		Log.i("z", "record buffer size" + recordBufferSize);
 
-		playBufferSize = sizeFactor * AudioTrack.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
+		playBufferSize = totalSeconds * frequency;
 
 		Log.i("z", "play buffer size" + playBufferSize);
 
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recordBufferSize);
-		
+
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufferSize, AudioTrack.MODE_STREAM);
 
 		audioTrack.setStereoVolume(0.7f, 0.7f);
+	}
+
+	public static AudioRecorderManager getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new AudioRecorderManager();
+		}
+
+		return instance;
 	}
 
 	public void startAudioRecorder()
@@ -52,12 +69,14 @@ public class AudioRecorderManager
 			public void run()
 			{
 				Log.i("z", "start audio record = " + audioRecord);
-				isRecording = true;
-				audioRecord.startRecording();
-				while (isRecording)
+
+				if (audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED)
 				{
-					updateBuffer();
+					Log.i("z", "AudioRecord has not been initialized.");
+					return;
 				}
+
+				audioRecord.startRecording();
 			}
 
 		}).start();
@@ -71,20 +90,16 @@ public class AudioRecorderManager
 			public void run()
 			{
 				Log.i("z", "stop audio record = " + audioRecord);
-				isRecording = false;
+				if (audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED)
+				{
+					Log.i("z", "AudioRecord has not been initialized.");
+					return;
+				}
+
+				updateBuffer();
 				audioRecord.stop();
 			}
 		}).start();
-	}
-
-	public void updateBuffer()
-	{
-		byte[] tmpBuffer = new byte[recordBufferSize];
-		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
-
-		Log.i("z", "buffer read result = " + bufferReadResult);
-		buffer = new byte[bufferReadResult];
-		System.arraycopy(tmpBuffer, 0, buffer, 0, bufferReadResult);
 	}
 
 	public void playAudioRecord()
@@ -108,44 +123,96 @@ public class AudioRecorderManager
 		audioTrack.stop();
 	}
 
-	public void saveAudioFile(byte[] buffer, String filePath)
+	private void updateBuffer()
 	{
-		FileOutputStream outputFile = null;
+		short[] tmpBuffer = new short[recordBufferSize];
+		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
 
-		try
-		{
-			Log.i("z", "file path = " + filePath);
-			outputFile = new FileOutputStream(filePath);
-		} catch (FileNotFoundException e)
-		{
-			Log.e("z", "Cannot create file");
-		}
-
-		try
-		{
-			if (buffer != null)
-			{
-				outputFile.write(buffer);
-			}
-		} catch (IOException e)
-		{
-			Log.e("z", "Fail to write " + "" + "audio file.");
-		}
+		Log.i("z", "buffer read result = " + bufferReadResult);
+		buffer = new short[bufferReadResult];
+		System.arraycopy(tmpBuffer, 0, buffer, 0, bufferReadResult);
 	}
 
-	public byte[] getAudioData()
+	public short[] getAudioData()
 	{
-		if (audioRecord == null)
+		return buffer;
+	}
+
+	public void saveVectorToFile(final String fileName)
+	{
+		new Thread(new Runnable()
 		{
-			return null;
-		}
+			@Override
+			public void run()
+			{
+				// TODO: add a maximum wait time.
+				while (true)
+				{
+					if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_STOPPED)
+					{
+						break;
+					}
+				}
 
-		short buffer[] = new short[recordBufferSize];
-		int bufferReadResult = audioRecord.read(buffer, 0, recordBufferSize);
+				Log.i("z", "Save file.");
+				MFCC mfcc = new MFCC(13, frequency, 24, 256, true, 22, true);
 
-		byte[] tmpBuf = new byte[bufferReadResult];
-		System.arraycopy(buffer, 0, tmpBuf, 0, bufferReadResult);
-		return tmpBuf;
+				ArrayList<Double> arrList = new ArrayList<Double>();
+
+				Log.i("z", "buffer = " + buffer.length);
+
+				mfcc.preprocess(buffer, arrList);
+
+				double[] sample = new double[arrList.size()];
+				for (int i = 0; i < arrList.size(); i++)
+				{
+					sample[i] = arrList.get(i);
+				}
+
+				double[][] featureVec = mfcc.doMFCC(sample, 0.02, 0.01);
+
+				File file = FileManager.createAudioFile(fileName, "AutoAnswerCall");
+
+				OutputStreamWriter os;
+				try
+				{
+					os = new OutputStreamWriter(new FileOutputStream(file));
+					try
+					{
+						int rowNumber = featureVec.length;
+						int colNumber = featureVec[0].length;
+						Log.i("z", "row = " + rowNumber);
+						Log.i("z", "col = " + colNumber);
+
+						for (int i = 0; i < rowNumber; ++i)
+						{
+							for (int j = 0; j < colNumber; ++j)
+							{
+								os.write(featureVec[i][j] + " ");
+							}
+
+							os.write("\r\n");
+						}
+
+						Log.i("z", "Save successfully.");
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					os.close();
+				} catch (FileNotFoundException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).start();
+
 	}
 
 	public void Destory()
