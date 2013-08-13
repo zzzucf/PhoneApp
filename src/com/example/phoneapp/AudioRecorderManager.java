@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Timer;
 
 import com.mfcc.MFCC;
 
@@ -15,6 +17,8 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.os.Environment;
+import android.text.format.Time;
 import android.util.Log;
 
 public class AudioRecorderManager
@@ -38,17 +42,17 @@ public class AudioRecorderManager
 	{
 		recordBufferSize = totalSeconds * frequency;
 
-		Log.i("z", "record buffer size" + recordBufferSize);
+		AppLog.i("record buffer size" + recordBufferSize);
 
 		playBufferSize = totalSeconds * frequency;
 
-		Log.i("z", "play buffer size" + playBufferSize);
+		AppLog.i("play buffer size" + playBufferSize);
 
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recordBufferSize);
 
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufferSize, AudioTrack.MODE_STREAM);
 
-		audioTrack.setStereoVolume(0.7f, 0.7f);
+		audioTrack.setStereoVolume(0.8f, 0.8f);
 	}
 
 	public static AudioRecorderManager getInstance()
@@ -68,11 +72,11 @@ public class AudioRecorderManager
 			@Override
 			public void run()
 			{
-				Log.i("z", "start audio record = " + audioRecord);
+				AppLog.i("start audio record = " + audioRecord);
 
 				if (audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED)
 				{
-					Log.i("z", "AudioRecord has not been initialized.");
+					AppLog.i("AudioRecord has not been initialized.");
 					return;
 				}
 
@@ -89,10 +93,10 @@ public class AudioRecorderManager
 			@Override
 			public void run()
 			{
-				Log.i("z", "stop audio record = " + audioRecord);
+				AppLog.i("stop audio record = " + audioRecord);
 				if (audioRecord.getState() == AudioRecord.STATE_UNINITIALIZED)
 				{
-					Log.i("z", "AudioRecord has not been initialized.");
+					AppLog.i("AudioRecord has not been initialized.");
 					return;
 				}
 
@@ -119,7 +123,7 @@ public class AudioRecorderManager
 		audioTrack.flush();
 		audioTrack.play();
 		audioTrack.write(buffer, 0, buffer.length);
-		Log.i("z", "play audio track");
+		AppLog.i("play audio track");
 		audioTrack.stop();
 	}
 
@@ -128,7 +132,7 @@ public class AudioRecorderManager
 		short[] tmpBuffer = new short[recordBufferSize];
 		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
 
-		Log.i("z", "buffer read result = " + bufferReadResult);
+		AppLog.i("buffer read result = " + bufferReadResult);
 		buffer = new short[bufferReadResult];
 		System.arraycopy(tmpBuffer, 0, buffer, 0, bufferReadResult);
 	}
@@ -137,8 +141,9 @@ public class AudioRecorderManager
 	{
 		return buffer;
 	}
-
-	public void saveVectorToFile(final String fileName)
+	
+	// TODO: Pass in a file object.
+	public void saveVectorToFile(final String folderName, final String fileName)
 	{
 		new Thread(new Runnable()
 		{
@@ -153,14 +158,11 @@ public class AudioRecorderManager
 						break;
 					}
 				}
-
-				Log.i("z", "Save file.");
+				
+				AppLog.i("Save file.");
 				MFCC mfcc = new MFCC(13, frequency, 24, 256, true, 22, true);
-
 				ArrayList<Double> arrList = new ArrayList<Double>();
-
-				Log.i("z", "buffer = " + buffer.length);
-
+				AppLog.i("buffer = " + buffer.length);
 				mfcc.preprocess(buffer, arrList);
 
 				double[] sample = new double[arrList.size()];
@@ -170,9 +172,8 @@ public class AudioRecorderManager
 				}
 
 				double[][] featureVec = mfcc.doMFCC(sample, 0.02, 0.01);
-
-				File file = FileManager.createAudioFile(fileName, "AutoAnswerCall");
-
+				
+				File file = FileManager.createFolderAndFile(folderName, fileName);
 				OutputStreamWriter os;
 				try
 				{
@@ -181,8 +182,8 @@ public class AudioRecorderManager
 					{
 						int rowNumber = featureVec.length;
 						int colNumber = featureVec[0].length;
-						Log.i("z", "row = " + rowNumber);
-						Log.i("z", "col = " + colNumber);
+						AppLog.i("row = " + rowNumber);
+						AppLog.i("col = " + colNumber);
 
 						for (int i = 0; i < rowNumber; ++i)
 						{
@@ -194,7 +195,7 @@ public class AudioRecorderManager
 							os.write("\r\n");
 						}
 
-						Log.i("z", "Save successfully.");
+						AppLog.i("Save successfully.");
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
@@ -215,6 +216,12 @@ public class AudioRecorderManager
 
 	}
 
+	// Implement this function.
+	public void readVectorFile(File file)
+	{
+		
+	}
+	
 	public void Destory()
 	{
 		if (audioRecord != null)
@@ -231,5 +238,6 @@ public class AudioRecorderManager
 		}
 
 		buffer = null;
+		instance = null;
 	}
 }

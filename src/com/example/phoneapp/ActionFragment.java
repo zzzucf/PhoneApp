@@ -19,16 +19,16 @@ import android.widget.TextView;
 public class ActionFragment extends Fragment
 {
 	private ActionEnum actionName;
-	private File audioFile;
-	private String audiofileName;
+	private File featureFile;
 	private String featureFileName;
 
+	final static String DATAFOLDERNAME = "VoiceAnswerCall";
+	
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
 
 		this.actionName = actionName;
-		this.audiofileName = actionName + "_clip";
 		this.featureFileName = actionName + "_feature";
 	}
 
@@ -79,7 +79,7 @@ public class ActionFragment extends Fragment
 						btnRecord.setText(R.string.label_record);
 
 						AudioRecorderManager.getInstance().stopAudioRecorder();
-						AudioRecorderManager.getInstance().saveVectorToFile(featureFileName);
+						AudioRecorderManager.getInstance().saveVectorToFile(DATAFOLDERNAME, featureFileName);
 						break;
 					}
 				}
