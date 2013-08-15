@@ -105,7 +105,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		}
 		catch (Exception e)
 		{
-			Log.e("z", e.toString());
+			AppLog.e(e.getMessage());
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		}
 		catch (Exception e)
 		{
-			Log.e("z", e.toString());
+			AppLog.e(e.getMessage());
 		}
 	}
 	
@@ -165,8 +165,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		InputStream inputStream = getResources().openRawResource(R.raw.svm3);
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 		
-		Log.i("z", "reader = " + reader);
-		Log.i("z", "start predicting");
+		AppLog.i("start predicting");
 		
 		// Init svm with a separate thread.
 		new Thread(new Runnable()

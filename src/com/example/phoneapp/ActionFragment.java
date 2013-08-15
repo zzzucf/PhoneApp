@@ -19,8 +19,8 @@ import android.widget.TextView;
 public class ActionFragment extends Fragment
 {
 	private ActionEnum actionName;
-	private File featureFile;
-	private String featureFileName;
+	private String featureFileName = "_feature";
+	private String clipFileName = "_clip";
 
 	final static String DATAFOLDERNAME = "VoiceAnswerCall";
 	
@@ -29,15 +29,14 @@ public class ActionFragment extends Fragment
 		super();
 
 		this.actionName = actionName;
-		this.featureFileName = actionName + "_feature";
+		this.featureFileName = actionName + featureFileName;
+		this.clipFileName = actionName + clipFileName;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		Log.i("z", "manager init.");
 	}
 
 	@Override
@@ -63,8 +62,7 @@ public class ActionFragment extends Fragment
 					{
 						Log.i("z", "key down");
 
-						Button btnRecord = (Button) v
-								.findViewById(R.id.BtnRecord);
+						Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
 						btnRecord.setText(R.string.label_stop);
 
 						AudioRecorderManager.getInstance().startAudioRecorder();
@@ -78,8 +76,12 @@ public class ActionFragment extends Fragment
 								.findViewById(R.id.BtnRecord);
 						btnRecord.setText(R.string.label_record);
 
+						File featureFile = FileManager.createFolderAndFile(DATAFOLDERNAME, featureFileName);
+						File clipFile = FileManager.createFolderAndFile(DATAFOLDERNAME, clipFileName);
+						
 						AudioRecorderManager.getInstance().stopAudioRecorder();
-						AudioRecorderManager.getInstance().saveVectorToFile(DATAFOLDERNAME, featureFileName);
+						AudioRecorderManager.getInstance().saveVectorToFile(featureFile);
+						AudioRecorderManager.getInstance().saveAudioBufferToFile(clipFile);
 						break;
 					}
 				}
@@ -95,6 +97,8 @@ public class ActionFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
+				File file = FileManager.openFileInFolder(DATAFOLDERNAME, clipFileName);
+				//AudioRecorderManager.getInstance().loadAudioBufferFromFile(file);
 				AudioRecorderManager.getInstance().playAudioRecord();
 			}
 		});

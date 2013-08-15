@@ -1,9 +1,8 @@
 package com;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import android.util.Log;
 
 import com.dtw.TimeWarpInfo;
 import com.mfcc.MFCC;
@@ -34,10 +33,10 @@ public class voiceMatch
 		mfcc = new MFCC(nMFCCs, fs, nFilters, FFTlength, true, 22, true);
 	}
 
-	public double doDtwMatch(double[][] feature1, short[] audio2)
+	public double doDtwMatch(double[][] feature, short[] audio)
 	{
 		ArrayList<Double> arrList2 = new ArrayList<Double>();
-		if (mfcc.preprocess(audio2, arrList2) > 0)
+		if (mfcc.preprocess(audio, arrList2) > 0)
 		{
 			return Double.POSITIVE_INFINITY;
 		} else
@@ -48,10 +47,10 @@ public class voiceMatch
 			{
 				sample2[i] = arrList2.get(i);
 			}
-			double[][] ts1 = new double[feature1.length][m_featurenum];
-			for (int i = 0; i < feature1.length; ++i)
+			double[][] ts1 = new double[feature.length][m_featurenum];
+			for (int i = 0; i < feature.length; ++i)
 			{
-				ts1[i] = Arrays.copyOfRange(feature1[i], 0, m_featurenum - 1);
+				ts1[i] = Arrays.copyOfRange(feature[i], 0, m_featurenum - 1);
 			}
 
 			// double[][] ts2 = new double[sample2.length][];
@@ -60,6 +59,7 @@ public class voiceMatch
 			final TimeSeries tsI = new TimeSeries(ts1);
 			final TimeSeries tsJ = new TimeSeries(ts2);
 			final TimeWarpInfo info = com.dtw.DTW.getWarpInfoBetween(tsI, tsJ, m_distFn);
+			
 			return info.getDistance();
 		}
 	}
@@ -199,20 +199,15 @@ public class voiceMatch
 		}
 	}
 
-	public static void test(String[] args)
+	// TODO: Implement this.
+	public static void saveBufferToFile(byte[] buffer, File file)
 	{
-		short[] audio1 =
-		{ 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 9, 10, 3, 5, 6, 9, 2, 3, 0, 0, 0, 0, 0 };
-		short[] audio2 =
-		{ 0, 0, 0, 0, 0, 0, 1, 2, 4, 4, 5, 6, 8, 9, 10, 10, 8, 8, 9, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0 };
-		voiceMatch vm = new voiceMatch(false, 13, 10.0, 24, 32, 10, "EuclideanDistance");
-
-		long startTime = System.nanoTime();
-		vm.doFDtwMatch(audio1, audio2);
-		long endTime = System.nanoTime();
-
-		long duration = endTime - startTime;
-		Log.i("z", "Computing Time: " + String.valueOf(duration / 1e6) + "ms");
+		
 	}
-
+	
+	// TODO: Implement this.
+	public static byte[] loadBufferFromFile(File file)
+	{
+		return null;
+	}
 }
