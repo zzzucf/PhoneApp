@@ -23,7 +23,7 @@ public class ActionFragment extends Fragment
 	private String clipFileName = "_clip";
 
 	final static String DATAFOLDERNAME = "VoiceAnswerCall";
-	
+
 	public ActionFragment(ActionEnum actionName)
 	{
 		super();
@@ -40,14 +40,12 @@ public class ActionFragment extends Fragment
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View v = inflater.inflate(R.layout.action_fragment, container, false);
 
 		// Setup action name label.
-		TextView actionNameLabel = (TextView) v
-				.findViewById(R.id.LblActionName);
+		TextView actionNameLabel = (TextView) v.findViewById(R.id.LblActionName);
 		actionNameLabel.setText(actionName + "");
 
 		// Setup button onTouch event.
@@ -72,15 +70,15 @@ public class ActionFragment extends Fragment
 					{
 						Log.i("z", "key up");
 
-						Button btnRecord = (Button) v
-								.findViewById(R.id.BtnRecord);
+						Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
 						btnRecord.setText(R.string.label_record);
 
 						File featureFile = FileManager.createFolderAndFile(DATAFOLDERNAME, featureFileName);
 						File clipFile = FileManager.createFolderAndFile(DATAFOLDERNAME, clipFileName);
-						
+
 						AudioRecorderManager.getInstance().stopAudioRecorder();
-						AudioRecorderManager.getInstance().saveVectorToFile(featureFile);
+
+						AudioRecorderManager.getInstance().saveFeatureToFile(featureFile);
 						AudioRecorderManager.getInstance().saveAudioBufferToFile(clipFile);
 						break;
 					}
@@ -98,19 +96,19 @@ public class ActionFragment extends Fragment
 			public void onClick(View v)
 			{
 				File file = FileManager.openFileInFolder(DATAFOLDERNAME, clipFileName);
-				//AudioRecorderManager.getInstance().loadAudioBufferFromFile(file);
+				AudioRecorderManager.getInstance().loadAudioBufferFromFile(file);
 				AudioRecorderManager.getInstance().playAudioRecord();
 			}
 		});
 
 		return v;
 	}
-	
+
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		
+
 		AudioRecorderManager.getInstance().Destory();
 	}
 }

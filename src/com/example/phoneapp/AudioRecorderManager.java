@@ -33,21 +33,18 @@ public class AudioRecorderManager
 	AudioTrack audioTrack = null;
 	
 	short[] buffer = null;
+
+	boolean saveFeatureSuccess = false;
+	boolean saveClipSuccess = false;
 	
 	static AudioRecorderManager instance;
 	
 	private AudioRecorderManager()
 	{
 		recordBufferSize = totalSeconds * frequency;
-		
-		AppLog.i("record buffer size" + recordBufferSize);
-		
 		playBufferSize = totalSeconds * frequency;
 		
-		AppLog.i("play buffer size" + playBufferSize);
-		
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recordBufferSize);
-		
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufferSize, AudioTrack.MODE_STREAM);
 		
 		audioTrack.setStereoVolume(0.8f, 0.8f);
@@ -115,6 +112,8 @@ public class AudioRecorderManager
 	
 	public void playAudioRecord()
 	{
+		AppLog.i("Start play audio.");
+		
 		if (audioTrack == null)
 		{
 			AppLog.e("Cannot play audio record because audioTrack has not been initialized.");
@@ -140,19 +139,24 @@ public class AudioRecorderManager
 			}
 		}
 		
+		audioTrack.setStereoVolume(0.8f, 0.8f);
 		audioTrack.flush();
 		audioTrack.play();
 		audioTrack.write(buffer, 0, buffer.length);
 		audioTrack.stop();
+		
+		AppLog.i("Play audio success.");
 	}
 	
-	public void saveVectorToFile(final File file)
+	public void saveFeatureToFile(final File file)
 	{
 		Thread t = new Thread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				saveFeatureSuccess = false;
+				
 				while (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_STOPPED)
 				{
 					try
@@ -164,8 +168,6 @@ public class AudioRecorderManager
 						AppLog.e(e.getMessage());
 					}
 				}
-				
-				AppLog.i("Save file.");
 				
 				MFCC mfcc = new MFCC(13, frequency, 24, 256, true, 22, true);
 				AppLog.i("buffer = " + buffer.length);
@@ -206,12 +208,13 @@ public class AudioRecorderManager
 							os.write("\r\n");
 						}
 						
-						AppLog.i("Save successfully.");
+						
 					}
 					catch (IOException e)
 					{
 						AppLog.e(e.getMessage());
 					}
+					
 					os.close();
 				}
 				catch (FileNotFoundException e)
@@ -222,6 +225,9 @@ public class AudioRecorderManager
 				{
 					AppLog.e(e.getMessage());
 				}
+				
+				saveFeatureSuccess = true;
+				AppLog.i("Feature saved successfully.");
 			}
 		});
 		t.start();
@@ -230,43 +236,61 @@ public class AudioRecorderManager
 	
 	public void saveAudioBufferToFile(final File file)
 	{
+		AppLog.i("Start!!!");
 		new Thread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
+				saveClipSuccess = false;
+				
+				while (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_STOPPED)
+				{
+					try
+					{
+						Thread.sleep(200);
+					}
+					catch (InterruptedException e)
+					{
+						AppLog.e(e.getMessage());
+					}
+				}
+				
+				AppLog.i("Start saving.");
 				OutputStreamWriter os = null;
 				try
 				{
 					os = new OutputStreamWriter(new FileOutputStream(file));
+					AppLog.i("os = "+ os);
 				}
 				catch (FileNotFoundException e)
 				{
 					AppLog.e(e.getMessage());
 				}
 				
+				for (int i = 0; i < buffer.length; ++i)
+				{
+					try
+					{
+						AppLog.i("Index = " + i);
+						os.write(buffer[i] + " ");
+					}
+					catch (IOException e)
+					{
+						AppLog.e(e.getMessage());
+					}
+				}
+				
 				try
 				{
-					os.write("abcd");
-				}
-				catch (IOException e)
+					os.close();
+				} catch (IOException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					AppLog.i(e.getMessage());
 				}
 				
-//				for (int i = 0; i < buffer.length; ++i)
-//				{
-//					try
-//					{
-//						os.write(buffer[i] + " ");
-//					}
-//					catch (IOException e)
-//					{
-//						AppLog.e(e.getMessage());
-//					}
-//				}
-				
+				saveClipSuccess = true;
+				AppLog.i("Feature saved successfully.");
 			}
 		}).start();
 	}
@@ -332,6 +356,13 @@ public class AudioRecorderManager
 	// Load audio buffer from file.
 	public void loadAudioBufferFromFile(File file)
 	{
+		if (buffer != null)
+		{
+			return;
+		}
+		
+		AppLog.i("loadAudioBufferFromFile start.");
+		
 		InputStream input;
 		try
 		{
@@ -365,6 +396,8 @@ public class AudioRecorderManager
 		{
 			AppLog.e(e.getMessage());
 		}
+		
+		AppLog.i("loadAudioBufferFromFile success.");
 	}
 	
 	public void Destory()
