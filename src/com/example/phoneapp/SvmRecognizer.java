@@ -15,7 +15,7 @@ class SvmRecognizer
 	public static svm_model model;
 	public static svm_node[] nodes;
 	private static SvmRecognizer instance;
-	
+
 	private SvmRecognizer()
 	{
 		// Make the constructor private and use the singleton method.
@@ -23,27 +23,27 @@ class SvmRecognizer
 		model = null;
 		nodes = null;
 	}
-	
+
 	public static SvmRecognizer getInstance()
 	{
 		if (instance == null)
 		{
 			instance = new SvmRecognizer();
 		}
-		
+
 		return instance;
 	}
-	
+
 	public boolean init(BufferedReader reader)
 	{
 		// dimension for feature vector.
-		final int dimemsion = 312; 
-		
+		final int dimemsion = 312;
+
 		// Get model
 		try
 		{
-			model = svm.svm_load_model(reader); 
-		} 
+			model = svm.svm_load_model(reader);
+		}
 		catch (IOException e)
 		{
 			Log.e("z", "Fail to load model.");
@@ -53,7 +53,7 @@ class SvmRecognizer
 		{
 			return false;
 		}
-		
+
 		// Get all classes.
 		classes = svm.svm_get_nr_class(model);
 
@@ -76,18 +76,16 @@ class SvmRecognizer
 		{
 			return -1;
 		}
-		
-		// TODO: Add comments here. 
+
+		// TODO: Add comments here.
 		double[] prob_estimates = new double[classes];
 
 		// TODO: Add comments here.
 		double label = svm.svm_predict_probability(model, nodes, prob_estimates);
 
 		// TODO: Add comments here.
-		double estimateValue = Math.max(
-				Math.max(prob_estimates[0], prob_estimates[1]),
-				prob_estimates[2]);
-		
+		double estimateValue = Math.max(Math.max(prob_estimates[0], prob_estimates[1]), prob_estimates[2]);
+
 		Log.i("z", "prob_estimates[0] = " + prob_estimates[0]);
 		Log.i("z", "prob_estimates[1] = " + prob_estimates[1]);
 		Log.i("z", "prob_estimates[2] = " + prob_estimates[2]);

@@ -6,10 +6,10 @@ public class AppLog
 {
 	// If DEBUG is true, log all the message, else show nothing.
 	final static boolean DEBUG = true;
-	
+
 	// Default tag for logging.
 	final static String DEFAULT_TAG = "z";
-	
+
 	// Use log to display info message.
 	public static void i(String msg)
 	{
@@ -18,7 +18,7 @@ public class AppLog
 			Log.i(DEFAULT_TAG, msg);
 		}
 	}
-	
+
 	// Use log to display info message.
 	public static void i(String tag, String msg)
 	{
@@ -27,7 +27,7 @@ public class AppLog
 			Log.i(tag, msg);
 		}
 	}
-	
+
 	// Use log to display error message.
 	public static void e(String msg)
 	{
@@ -36,7 +36,7 @@ public class AppLog
 			Log.e(DEFAULT_TAG, msg);
 		}
 	}
-	
+
 	// Use log to display error message.
 	public static void e(String tag, String msg)
 	{

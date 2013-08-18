@@ -7,6 +7,17 @@ import android.os.Environment;
 
 public class FileManager
 {
+	// File name.
+	public final static String ANSWER_FEATURE_FILE_NAME = "answer_feature";
+	public final static String DECLINE_FEATURE_FILE_NAME = "decline_feature";
+	public final static String MUTE_FEATURE_FILE_NAME = "mute_feature";
+	public final static String ANSWER_CLIP_FILE_NAME = "answer_clip";
+	public final static String DECLINE_CLIP_FILE_NAME = "decline_clip";
+	public final static String MUTE_CLIP_FILE_NAME = "mute_feature";
+
+	// Root folder name.
+	public final static String ROOT_FOLDER_NAME = "VoiceAnswerCall";
+
 	// Create a folder under a path.
 	public static File createFolder(String path, String folderName)
 	{
@@ -16,23 +27,23 @@ public class FileManager
 		{
 			file.mkdir();
 		}
-		
+
 		return file;
 	}
-	
+
 	// Create a folder inside another folder.
 	public static File createFolder(File folder, String folderName)
 	{
 		File file = openFolder(folder, folderName);
-		
+
 		if (!file.exists())
 		{
 			file.mkdir();
 		}
-		
+
 		return file;
 	}
-	
+
 	// Open a folder under a path.
 	public static File openFolder(String path, String folderName)
 	{
@@ -40,12 +51,12 @@ public class FileManager
 		{
 			return null;
 		}
-		
+
 		File file = new File(path + "/" + folderName);
-		
+
 		return file;
 	}
-	
+
 	// Open a file inside another folder.
 	public static File openFolder(File folder, String folderName)
 	{
@@ -53,12 +64,12 @@ public class FileManager
 		{
 			return null;
 		}
-		
+
 		File file = new File(folder.getPath() + "/" + folderName);
-		
+
 		return file;
 	}
-	
+
 	// Create a file under a path.
 	public static File createFile(String path, String fileName)
 	{
@@ -74,10 +85,10 @@ public class FileManager
 				AppLog.e("Cannot create file.");
 			}
 		}
-		
+
 		return file;
 	}
-	
+
 	// Create a file under a folder.
 	public static File createFile(File folder, String fileName)
 	{
@@ -92,12 +103,12 @@ public class FileManager
 			{
 				AppLog.e("Cannot create file.");
 			}
-			
+
 		}
-		
+
 		return file;
 	}
-	
+
 	// Open file under a path.
 	public static File openFile(String path, String fileName)
 	{
@@ -105,7 +116,7 @@ public class FileManager
 		{
 			return null;
 		}
-		
+
 		File file = new File(path + "/" + fileName);
 		return file;
 	}
@@ -117,11 +128,11 @@ public class FileManager
 		{
 			return null;
 		}
-		
+
 		File file = new File(folder + "/" + fileName);
 		return file;
 	}
-	
+
 	// Create folder and file.
 	public static File createFolderAndFile(String folderName, String fileName)
 	{
@@ -130,7 +141,7 @@ public class FileManager
 		File file = createFile(folder, fileName);
 		return file;
 	}
-	
+
 	// Open file inside a folder.
 	public static File openFileInFolder(String folderName, String fileName)
 	{
@@ -139,7 +150,7 @@ public class FileManager
 		File file = openFile(folder, fileName);
 		return file;
 	}
-	
+
 	// Check if sd card is accessible.
 	private static boolean SDCardMounted()
 	{
@@ -147,7 +158,7 @@ public class FileManager
 		{
 			AppLog.e("SD card has not been mounted.");
 		}
-		
+
 		return true;
 	}
 }

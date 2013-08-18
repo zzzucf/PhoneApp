@@ -22,55 +22,57 @@ public class TTSService extends Service implements OnInitListener
 	private TextToSpeech tts;
 	private String number;
 	private String contactName;
-	
+
 	@Override
 	public void onStart(Intent intent, int reslut)
 	{
 		number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 		contactName = getContactName(number);
 
-		if (number != null && number !="")
+		if (number != null && number != "")
 		{
 			tts = new TextToSpeech(getApplicationContext(), this);
 		}
 	}
-	
+
 	private void speak(String text)
 	{
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 	}
-	
-	private String getContactName(String number) 
+
+	private String getContactName(String number)
 	{
-	    Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
-	    String name = "";
+		Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
+		String name = "";
 
-	    ContentResolver contentResolver = getContentResolver();
-	    Cursor contactLookup = contentResolver.query(uri, new String[] {BaseColumns._ID, ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+		ContentResolver contentResolver = getContentResolver();
+		Cursor contactLookup = contentResolver.query(uri, new String[]
+		{ BaseColumns._ID, ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
 
-	    try
-	    {
-	        if (contactLookup != null && contactLookup.getCount() > 0) 
-	        {
-	            contactLookup.moveToNext();
-	            name = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
-	        }
-	    } 
-	    finally 
-	    {
-	        if (contactLookup != null) 
-	        {
-	            contactLookup.close();
-	        }
-	    }
+		try
+		{
+			if (contactLookup != null && contactLookup.getCount() > 0)
+			{
+				contactLookup.moveToNext();
+				name = contactLookup.getString(contactLookup.getColumnIndex(ContactsContract.Data.DISPLAY_NAME));
+			}
+		}
+		finally
+		{
+			if (contactLookup != null)
+			{
+				contactLookup.close();
+			}
+		}
 
-	    return name;
+		return name;
 	}
-	
+
 	private String numberToString(String number)
 	{
-		// TODO: This function only works for english version. But for chinese version, we need to add something more.
-		
+		// TODO: This function only works for english version. But for chinese
+		// version, we need to add something more.
+
 		number = number.replaceAll("1", "one ");
 		number = number.replaceAll("2", "two ");
 		number = number.replaceAll("3", "three ");
@@ -81,24 +83,25 @@ public class TTSService extends Service implements OnInitListener
 		number = number.replaceAll("8", "eight ");
 		number = number.replaceAll("9", "nine ");
 		number = number.replaceAll("0", "zero ");
-		
+
 		return number;
 	}
-	
+
 	private void enableSpeaker()
 	{
 		Context context = getApplicationContext();
-		
+
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		audioManager.setSpeakerphoneOn(true);
 	}
-	
+
 	@Override
-	public void onDestroy() 
+	public void onDestroy()
 	{
 		Log.i("z", "destory tts.");
-		
-		if (tts != null) {
+
+		if (tts != null)
+		{
 			tts.stop();
 			tts.shutdown();
 		}
@@ -111,7 +114,7 @@ public class TTSService extends Service implements OnInitListener
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public void onInit(int status)
 	{
@@ -124,12 +127,12 @@ public class TTSService extends Service implements OnInitListener
 			{
 				Log.e("TTS", "This Language is not supported");
 			}
-			else 
+			else
 			{
 				enableSpeaker();
 				speak("Calling from " + contactName + numberToString(number));
 			}
-		} 
+		}
 		else
 		{
 			Log.e("TTS", "Initilization Failed!");

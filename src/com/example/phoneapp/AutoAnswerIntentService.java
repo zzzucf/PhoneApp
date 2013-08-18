@@ -57,34 +57,42 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 		Context context = getBaseContext();
 
 		// If the phone is not ringing then return.
-		TelephonyManager tm = (TelephonyManager) context
-				.getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		if (tm.getCallState() != TelephonyManager.CALL_STATE_RINGING)
 		{
 			return;
 		}
 
+		AudioRecorderManager.getInstance().startAudioRecorder();
+
 		// Try matching the file.
 		int result = tryMatchResult();
 
-		if (result == -1)
+		AudioRecorderManager.getInstance().stopAudioRecorder();
+
+		if (result == AudioMatchingManager.RESULT_NONE)
+		{
+
+		}
+		else if (result == AudioMatchingManager.RESULT_ANSWER)
 		{
 			// Answer the phone
 			try
 			{
-				answerPhoneAidl(context);
-			} catch (Exception e)
+				answerPhoneCall(context);
+			}
+			catch (Exception e)
 			{
 				answerPhoneHeadsethook(context);
 			}
 		}
-		else if (result == 1)
-		{
-			// 
-		}
-		else if (result == 2)
+		else if (result == AudioMatchingManager.RESULT_DECLINE)
 		{
 			endPhoneCall(context);
+		}
+		else if (result == AudioMatchingManager.RESULT_MUTE)
+		{
+			mutePhoneCall(context);
 		}
 
 		return;
@@ -92,27 +100,36 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 
 	private int tryMatchResult()
 	{
-		AudioMatchingManager manager = new AudioMatchingManager();
-
 		for (int i = 0; i < MAXIMUMTRIES; ++i)
 		{
+			short[] buffer = AudioRecorderManager.getInstance().GetAudioBuffer();
+
 			Log.i("z", "try match!");
-			if (manager.match() != -1)
+
+			int result = AudioMatchingManager.getInstance().match(buffer);
+			AppLog.i("matching result = " + result);
+
+			if (result != AudioMatchingManager.RESULT_NONE)
 			{
-				return manager.match();
+				return result;
 			}
 
 			try
 			{
-				Thread.sleep(1000);
-			} catch (InterruptedException e1)
+				Thread.sleep(500);
+			}
+			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				AppLog.e(e.getMessage());
 			}
 		}
 
-		return -1;
+		return AudioMatchingManager.RESULT_NONE;
 	}
 
+	@Override
+	public void onDestroy()
+	{
+		AudioRecorderManager.getInstance().Destory();
+	}
 }

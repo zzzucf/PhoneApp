@@ -23,30 +23,30 @@ import android.view.View;
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
 {
 	private PhoneBroadcastReceiver mBroadcastReceiver;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		// Init svm
 		// initSvm();
-		
+
 		// Add fragment to record a audio and play a audio.
 		addActionFragment(ActionEnum.Answer);
 		addActionFragment(ActionEnum.Decline);
 		addActionFragment(ActionEnum.Mute);
-		
+
 		setContentView(R.layout.activity_main);
-		
+
 		// Register a broadcast receiver to receive phone state change event.
 		registerPhoneBroadcastReceiver();
-		
+
 		// Register a listener to apply preference change.
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
-	
+
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
 	{
@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			onLanguageChange(sharedPreferences);
 		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
@@ -68,31 +68,31 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			moveTaskToBack(true);
 			return true;
 		}
-		
+
 		return super.onKeyDown(keyCode, event);
 	}
-	
+
 	@Override
 	public void onDestroy()
 	{
 		super.onDestroy();
-		
+
 		unregisterPhoneBroadcastReceiver();
 		mBroadcastReceiver = null;
 	}
-	
+
 	public void addActionFragment(ActionEnum action)
 	{
 		FragmentTransaction transaction = getFragmentManager().beginTransaction();
-		
+
 		// Add the transaction.
 		transaction.add(R.id.actionFragmentContainer, new ActionFragment(action));
 		transaction.addToBackStack(null);
-		
+
 		// Commit the transaction.
 		transaction.commit();
 	}
-	
+
 	public void registerPhoneBroadcastReceiver()
 	{
 		try
@@ -108,7 +108,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			AppLog.e(e.getMessage());
 		}
 	}
-	
+
 	public void unregisterPhoneBroadcastReceiver()
 	{
 		try
@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			AppLog.e(e.getMessage());
 		}
 	}
-	
+
 	public void onEnableChange(SharedPreferences sharedPreferences)
 	{
 		if (sharedPreferences.getBoolean(getString(R.string.key_enable), true))
@@ -132,12 +132,12 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			unregisterPhoneBroadcastReceiver();
 		}
 	}
-	
+
 	public void onLanguageChange(SharedPreferences sharedPreferences)
 	{
 		String language = sharedPreferences.getString(getString(R.string.key_language), "");
 		Configuration config = getResources().getConfiguration();
-		
+
 		if (language.toString().equals("Cn"))
 		{
 			config.locale = Locale.CHINESE;
@@ -146,27 +146,27 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		{
 			config.locale = Locale.ENGLISH;
 		}
-		
+
 		getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-		
+
 		restartActivity();
 	}
-	
+
 	public void restartActivity()
 	{
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
 	}
-	
+
 	// TODO: Change svm to service.
 	public void initSvm()
 	{
 		InputStream inputStream = getResources().openRawResource(R.raw.svm3);
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-		
+
 		AppLog.i("start predicting");
-		
+
 		// Init svm with a separate thread.
 		new Thread(new Runnable()
 		{
@@ -180,7 +180,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			}
 		}).start();
 	}
-	
+
 	// TODO: Testing buttons.
 	public void predict(View v)
 	{

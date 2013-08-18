@@ -19,10 +19,8 @@ import android.widget.TextView;
 public class ActionFragment extends Fragment
 {
 	private ActionEnum actionName;
-	private String featureFileName = "_feature";
-	private String clipFileName = "_clip";
-
-	final static String DATAFOLDERNAME = "VoiceAnswerCall";
+	private String featureFileName = "_Feature";
+	private String clipFileName = "_Clip";
 
 	public ActionFragment(ActionEnum actionName)
 	{
@@ -31,12 +29,6 @@ public class ActionFragment extends Fragment
 		this.actionName = actionName;
 		this.featureFileName = actionName + featureFileName;
 		this.clipFileName = actionName + clipFileName;
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
 	}
 
 	@Override
@@ -56,32 +48,32 @@ public class ActionFragment extends Fragment
 			{
 				switch (event.getAction())
 				{
-					case MotionEvent.ACTION_DOWN:
-					{
-						Log.i("z", "key down");
+				case MotionEvent.ACTION_DOWN:
+				{
+					Log.i("z", "key down");
 
-						Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
-						btnRecord.setText(R.string.label_stop);
+					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
+					btnRecord.setText(R.string.label_stop);
 
-						AudioRecorderManager.getInstance().startAudioRecorder();
-						break;
-					}
-					case MotionEvent.ACTION_UP:
-					{
-						Log.i("z", "key up");
+					AudioRecorderManager.getInstance().startAudioRecorder();
+					break;
+				}
+				case MotionEvent.ACTION_UP:
+				{
+					Log.i("z", "key up");
 
-						Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
-						btnRecord.setText(R.string.label_record);
+					Button btnRecord = (Button) v.findViewById(R.id.BtnRecord);
+					btnRecord.setText(R.string.label_record);
 
-						File featureFile = FileManager.createFolderAndFile(DATAFOLDERNAME, featureFileName);
-						File clipFile = FileManager.createFolderAndFile(DATAFOLDERNAME, clipFileName);
+					File featureFile = FileManager.createFolderAndFile(FileManager.ROOT_FOLDER_NAME, featureFileName);
+					File clipFile = FileManager.createFolderAndFile(FileManager.ROOT_FOLDER_NAME, clipFileName);
 
-						AudioRecorderManager.getInstance().stopAudioRecorder();
+					AudioRecorderManager.getInstance().stopAudioRecorder();
 
-						AudioRecorderManager.getInstance().saveFeatureToFile(featureFile);
-						AudioRecorderManager.getInstance().saveAudioBufferToFile(clipFile);
-						break;
-					}
+					AudioRecorderManager.getInstance().saveFeatureToFile(featureFile);
+					AudioRecorderManager.getInstance().saveAudioBufferToFile(clipFile);
+					break;
+				}
 				}
 
 				return true;
@@ -95,7 +87,7 @@ public class ActionFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				File file = FileManager.openFileInFolder(DATAFOLDERNAME, clipFileName);
+				File file = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, clipFileName);
 				AudioRecorderManager.getInstance().loadAudioBufferFromFile(file);
 				AudioRecorderManager.getInstance().playAudioRecord();
 			}

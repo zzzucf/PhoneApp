@@ -16,11 +16,11 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver
 	{
 		// Load preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		
+
 		// Check phone state
 		String phoneState = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 		Log.i("z", "broadcast receive " + phoneState);
-		
+
 		String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 		if (phoneState.equals(TelephonyManager.EXTRA_STATE_RINGING))
@@ -35,7 +35,7 @@ public class PhoneBroadcastReceiver extends BroadcastReceiver
 					return;
 				}
 			}
-			
+
 			// Start tts service.
 			Intent ttsIntent = new Intent(context, TTSService.class);
 			ttsIntent.putExtra(TelephonyManager.EXTRA_INCOMING_NUMBER, number);

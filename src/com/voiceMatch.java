@@ -39,7 +39,8 @@ public class voiceMatch
 		if (mfcc.preprocess(audio, arrList2) > 0)
 		{
 			return Double.POSITIVE_INFINITY;
-		} else
+		}
+		else
 		{
 			double[] sample2 = new double[arrList2.size()];
 
@@ -59,7 +60,7 @@ public class voiceMatch
 			final TimeSeries tsI = new TimeSeries(ts1);
 			final TimeSeries tsJ = new TimeSeries(ts2);
 			final TimeWarpInfo info = com.dtw.DTW.getWarpInfoBetween(tsI, tsJ, m_distFn);
-			
+
 			return info.getDistance();
 		}
 	}
@@ -71,7 +72,8 @@ public class voiceMatch
 		if (mfcc.preprocess(audio1, arrList1) > 0 || mfcc.preprocess(audio2, arrList2) > 0)
 		{
 			return Double.POSITIVE_INFINITY;
-		} else
+		}
+		else
 		{
 			double[] sample1 = new double[arrList1.size()];
 			double[] sample2 = new double[arrList2.size()];
@@ -94,7 +96,8 @@ public class voiceMatch
 				ts2 = mfcc.doMFCC(sample2, 0.02, 0.01);
 				tsI = new TimeSeries(ts1);
 				tsJ = new TimeSeries(ts2);
-			} else
+			}
+			else
 			{
 				double[][] ts1 = new double[sample1.length][m_featurenum];
 				double[][] ts2 = new double[sample2.length][m_featurenum];
@@ -120,7 +123,8 @@ public class voiceMatch
 		if (mfcc.preprocess(audio2, arrList2) > 0)
 		{
 			return Double.POSITIVE_INFINITY;
-		} else
+		}
+		else
 		{
 
 			double[] sample2 = new double[arrList2.size()];
@@ -152,7 +156,8 @@ public class voiceMatch
 		if (mfcc.preprocess(audio1, arrList1) > 0 || mfcc.preprocess(audio2, arrList2) > 0)
 		{
 			return Double.POSITIVE_INFINITY;
-		} else
+		}
+		else
 		{
 			double[] sample1 = new double[arrList1.size()];
 			double[] sample2 = new double[arrList2.size()];
@@ -179,7 +184,8 @@ public class voiceMatch
 				ts2 = mfcc.doMFCC(sample2, 0.02, 0.01);
 				tsI = new TimeSeries(ts1);
 				tsJ = new TimeSeries(ts2);
-			} else
+			}
+			else
 			{
 				double[][] ts1 = new double[sample1.length][1];
 				double[][] ts2 = new double[sample2.length][1];
@@ -202,9 +208,9 @@ public class voiceMatch
 	// TODO: Implement this.
 	public static void saveBufferToFile(byte[] buffer, File file)
 	{
-		
+
 	}
-	
+
 	// TODO: Implement this.
 	public static byte[] loadBufferFromFile(File file)
 	{
