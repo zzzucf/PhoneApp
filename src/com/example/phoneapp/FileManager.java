@@ -8,12 +8,12 @@ import android.os.Environment;
 public class FileManager
 {
 	// File name.
-	public final static String ANSWER_FEATURE_FILE_NAME = "answer_feature";
-	public final static String DECLINE_FEATURE_FILE_NAME = "decline_feature";
-	public final static String MUTE_FEATURE_FILE_NAME = "mute_feature";
-	public final static String ANSWER_CLIP_FILE_NAME = "answer_clip";
-	public final static String DECLINE_CLIP_FILE_NAME = "decline_clip";
-	public final static String MUTE_CLIP_FILE_NAME = "mute_feature";
+	public final static String ANSWER_FEATURE_FILE_NAME = "Answer_Feature";
+	public final static String DECLINE_FEATURE_FILE_NAME = "Decline_Feature";
+	public final static String MUTE_FEATURE_FILE_NAME = "Mute_Feature";
+	public final static String ANSWER_CLIP_FILE_NAME = "Answer_Clip";
+	public final static String DECLINE_CLIP_FILE_NAME = "Decline_Clip";
+	public final static String MUTE_CLIP_FILE_NAME = "Mute_Feature";
 
 	// Root folder name.
 	public final static String ROOT_FOLDER_NAME = "VoiceAnswerCall";

@@ -185,6 +185,6 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	public void predict(View v)
 	{
 		Log.i("z", "onclick");
-		SvmRecognizer.getInstance().predict();
+		
 	}
 }

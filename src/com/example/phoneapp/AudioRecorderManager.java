@@ -138,8 +138,7 @@ public class AudioRecorderManager
 			try
 			{
 				Thread.sleep(200);
-			}
-			catch (InterruptedException e)
+			} catch (InterruptedException e)
 			{
 				AppLog.e(e.getMessage());
 			}
@@ -157,10 +156,12 @@ public class AudioRecorderManager
 	// Return buffer.
 	public short[] GetAudioBuffer()
 	{
-		if (buffer == null)
-		{
-			AppLog.i("Buffer is empty.");
-		}
+		short[] tmpBuffer = new short[recordBufferSize];
+		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
+
+		AppLog.i("buffer read result = " + bufferReadResult);
+		buffer = new short[bufferReadResult];
+		System.arraycopy(tmpBuffer, 0, buffer, 0, bufferReadResult);
 
 		return buffer;
 	}
@@ -180,8 +181,7 @@ public class AudioRecorderManager
 					try
 					{
 						Thread.sleep(200);
-					}
-					catch (InterruptedException e)
+					} catch (InterruptedException e)
 					{
 						AppLog.e(e.getMessage());
 					}
@@ -226,19 +226,16 @@ public class AudioRecorderManager
 							os.write("\r\n");
 						}
 
-					}
-					catch (IOException e)
+					} catch (IOException e)
 					{
 						AppLog.e(e.getMessage());
 					}
 
 					os.close();
-				}
-				catch (FileNotFoundException e)
+				} catch (FileNotFoundException e)
 				{
 					AppLog.e(e.getMessage());
-				}
-				catch (IOException e)
+				} catch (IOException e)
 				{
 					AppLog.e(e.getMessage());
 				}
@@ -248,7 +245,8 @@ public class AudioRecorderManager
 			}
 		});
 		t.start();
-
+		
+		AudioMatchingManager.getInstance().UpdateFeatures();
 	}
 
 	// Save audio buffer to a file.
@@ -267,8 +265,7 @@ public class AudioRecorderManager
 					try
 					{
 						Thread.sleep(200);
-					}
-					catch (InterruptedException e)
+					} catch (InterruptedException e)
 					{
 						AppLog.e(e.getMessage());
 					}
@@ -280,8 +277,7 @@ public class AudioRecorderManager
 				{
 					os = new OutputStreamWriter(new FileOutputStream(file));
 					AppLog.i("os = " + os);
-				}
-				catch (FileNotFoundException e)
+				} catch (FileNotFoundException e)
 				{
 					AppLog.e(e.getMessage());
 				}
@@ -291,8 +287,7 @@ public class AudioRecorderManager
 					try
 					{
 						os.write(buffer[i] + " ");
-					}
-					catch (IOException e)
+					} catch (IOException e)
 					{
 						AppLog.e(e.getMessage());
 					}
@@ -301,8 +296,7 @@ public class AudioRecorderManager
 				try
 				{
 					os.close();
-				}
-				catch (IOException e)
+				} catch (IOException e)
 				{
 					AppLog.i(e.getMessage());
 				}
@@ -316,13 +310,14 @@ public class AudioRecorderManager
 	// Load feature from file.
 	public double[][] loadFeatureFromFile(File file)
 	{
+		AppLog.i("Start loading feature " + file.getName() + ".");
 		InputStream input;
 		try
 		{
 			input = new FileInputStream(file);
-		}
-		catch (FileNotFoundException e)
+		} catch (FileNotFoundException e)
 		{
+			AppLog.e(e.getMessage());
 			return null;
 		}
 
@@ -332,19 +327,23 @@ public class AudioRecorderManager
 		String line = "";
 		int rowNumber = 0;
 		int colNumber = 0;
+		double[][] featureVector = null;
+
 		try
 		{
 			rowNumber = Integer.parseInt(reader.readLine());
 			colNumber = Integer.parseInt(reader.readLine());
 
-			AppLog.i("row = " + rowNumber);
-			AppLog.i("col = " + colNumber);
-
-			double[][] featureVector = new double[rowNumber][colNumber];
+			featureVector = new double[rowNumber][colNumber];
 			int index = 0;
 			do
 			{
 				line = reader.readLine();
+				if (line == null)
+				{
+					break;
+				}
+				
 				String[] data = line.split(" ");
 				for (int i = 0; i < data.length; ++i)
 				{
@@ -353,25 +352,22 @@ public class AudioRecorderManager
 
 				index++;
 			} while (line != null);
-
-			reader.close();
-			return featureVector;
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
 			AppLog.e(e.getMessage());
 		}
 
+		// Close reader.
 		try
 		{
 			reader.close();
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
 			AppLog.e(e.getMessage());
 		}
 
-		return null;
+		AppLog.i("Load feature successfully.");
+		return featureVector;
 	}
 
 	// Load audio buffer from file.
@@ -383,8 +379,7 @@ public class AudioRecorderManager
 		try
 		{
 			input = new FileInputStream(file);
-		}
-		catch (FileNotFoundException e)
+		} catch (FileNotFoundException e)
 		{
 			return;
 		}
@@ -407,8 +402,7 @@ public class AudioRecorderManager
 			buffer = tmpBuffer;
 
 			reader.close();
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
 			AppLog.e(e.getMessage());
 		}

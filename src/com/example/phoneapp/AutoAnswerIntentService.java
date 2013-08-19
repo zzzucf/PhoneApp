@@ -45,7 +45,8 @@ import android.util.Log;
 public class AutoAnswerIntentService extends TelephonyIntentService
 {
 	private int MAXIMUMTRIES = 5;
-
+	private int INTERVAL = 1000;
+	
 	public AutoAnswerIntentService()
 	{
 		super("AutoAnswerIntentService");
@@ -56,6 +57,8 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 	{
 		Log.i("z", "start auto answer intent service");
 
+		// TODO: Add thread synchronization.
+		
 		Context context = getBaseContext();
 
 		// If the phone is not ringing then return.
@@ -70,7 +73,7 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 
 		int result;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		if (prefs.getBoolean(getString(R.string.key_enable_voice_matching), false))
+		if (!prefs.getBoolean(getString(R.string.key_enable_voice_matching), true))
 		{
 			result = AudioMatchingManager.RESULT_ANSWER;
 		}
@@ -119,7 +122,10 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 
 			Log.i("z", "try match!");
 
+			AppLog.i("buffer = " + buffer);
 			int result = AudioMatchingManager.getInstance().match(buffer);
+			
+			
 			AppLog.i("matching result = " + result);
 
 			if (result != AudioMatchingManager.RESULT_NONE)
@@ -129,7 +135,7 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 
 			try
 			{
-				Thread.sleep(500);
+				Thread.sleep(INTERVAL);
 			}
 			catch (InterruptedException e)
 			{
