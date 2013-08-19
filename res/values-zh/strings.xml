@@ -6,11 +6,13 @@
     <string name="label_record">按下录音</string>
     <string name="label_stop">松开结束</string>
     <string name="label_play">播放</string>
-   	<string name="label_enable">启用</string>	
+    <string name="label_enable">启用</string>
     <string name="label_language">语言</string>
-
-    <string name="key_enable">Enable</string>
-    <string name="key_language">Language</string>
+    
+    <string name="key_enable">启用</string>
+    <string name="key_enable_voice_matching">启用语音识别</string>
+    <string name="key_language">语言</string>
     
     <string name="summary_language">选择显示和语音识别语言</string>
+
 </resources>

@@ -44,15 +44,17 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f080000;
-        public static final int key_enable=0x7f080007;
-        public static final int key_language=0x7f080008;
+        public static final int key_enable=0x7f080008;
+        public static final int key_enable_voice_matching=0x7f080009;
+        public static final int key_language=0x7f08000a;
         public static final int label_action_name=0x7f080001;
         public static final int label_enable=0x7f080005;
-        public static final int label_language=0x7f080006;
+        public static final int label_enable_voice_matching=0x7f080006;
+        public static final int label_language=0x7f080007;
         public static final int label_play=0x7f080004;
         public static final int label_record=0x7f080002;
         public static final int label_stop=0x7f080003;
-        public static final int summary_language=0x7f080009;
+        public static final int summary_language=0x7f08000b;
     }
     public static final class style {
         /** 

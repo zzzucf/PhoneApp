@@ -25,9 +25,9 @@ public class AudioMatchingManager
 		File declineFeatureFile = FileManager.openFile(FileManager.ROOT_FOLDER_NAME, FileManager.DECLINE_FEATURE_FILE_NAME);
 		File muteFeatureFile = FileManager.openFile(FileManager.ROOT_FOLDER_NAME, FileManager.MUTE_FEATURE_FILE_NAME);
 
-		answerFeature = AudioRecorderManager.getInstance().loadVectorFromFile(answerFeatureFile);
-		declineFeature = AudioRecorderManager.getInstance().loadVectorFromFile(declineFeatureFile);
-		muteFeature = AudioRecorderManager.getInstance().loadVectorFromFile(muteFeatureFile);
+		answerFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(answerFeatureFile);
+		declineFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(declineFeatureFile);
+		muteFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(muteFeatureFile);
 	}
 
 	public static AudioMatchingManager getInstance()
@@ -42,6 +42,12 @@ public class AudioMatchingManager
 
 	public int match(short[] buffer)
 	{
+		if (answerFeature == null || declineFeature == null || muteFeature == null)
+		{
+			AppLog.i("Cannot load feature correctly.");
+			return RESULT_NONE;
+		}
+		
 		voiceMatch matching = new voiceMatch();
 		double answerResult = matching.doDtwMatch(answerFeature, buffer);
 		double declineResult = matching.doDtwMatch(declineFeature, buffer);
@@ -65,7 +71,7 @@ public class AudioMatchingManager
 			return RESULT_MUTE;
 		}
 
-		return -1;
+		return RESULT_NONE;
 	}
 
 }

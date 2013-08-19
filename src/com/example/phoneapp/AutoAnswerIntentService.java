@@ -37,6 +37,8 @@ package com.example.phoneapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -63,11 +65,22 @@ public class AutoAnswerIntentService extends TelephonyIntentService
 			return;
 		}
 
+		// Start audio recorder.
 		AudioRecorderManager.getInstance().startAudioRecorder();
 
-		// Try matching the file.
-		int result = tryMatchResult();
-
+		int result;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (prefs.getBoolean(getString(R.string.key_enable_voice_matching), false))
+		{
+			result = AudioMatchingManager.RESULT_ANSWER;
+		}
+		else
+		{
+			// Try matching the file.
+			result = tryMatchResult();
+		}
+		
+		// Stop audio recorder.
 		AudioRecorderManager.getInstance().stopAudioRecorder();
 
 		if (result == AudioMatchingManager.RESULT_NONE)

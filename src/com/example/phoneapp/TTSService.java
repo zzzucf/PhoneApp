@@ -111,7 +111,6 @@ public class TTSService extends Service implements OnInitListener
 	@Override
 	public IBinder onBind(Intent intent)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

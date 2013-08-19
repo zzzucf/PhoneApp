@@ -132,7 +132,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			unregisterPhoneBroadcastReceiver();
 		}
 	}
-
+	
 	public void onLanguageChange(SharedPreferences sharedPreferences)
 	{
 		String language = sharedPreferences.getString(getString(R.string.key_language), "");

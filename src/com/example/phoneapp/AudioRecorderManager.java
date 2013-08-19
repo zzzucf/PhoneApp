@@ -22,6 +22,7 @@ import android.media.MediaRecorder;
 public class AudioRecorderManager
 {
 	static final int frequency = 8000;
+	@SuppressWarnings("deprecation")
 	static final int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	static final int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -39,6 +40,7 @@ public class AudioRecorderManager
 
 	static AudioRecorderManager instance;
 
+	// Constructor.
 	private AudioRecorderManager()
 	{
 		recordBufferSize = totalSeconds * frequency;
@@ -50,6 +52,7 @@ public class AudioRecorderManager
 		audioTrack.setStereoVolume(0.8f, 0.8f);
 	}
 
+	// Singleton get instance object.
 	public static AudioRecorderManager getInstance()
 	{
 		if (instance == null)
@@ -60,6 +63,7 @@ public class AudioRecorderManager
 		return instance;
 	}
 
+	// Start audio recorder with a separate thread.
 	public void startAudioRecorder()
 	{
 		new Thread(new Runnable()
@@ -81,6 +85,7 @@ public class AudioRecorderManager
 		}).start();
 	}
 
+	// Stop audio recorder with a separate thread.
 	public void stopAudioRecorder()
 	{
 		new Thread(new Runnable()
@@ -110,6 +115,7 @@ public class AudioRecorderManager
 		}).start();
 	}
 
+	// Play audio buffer.
 	public void playAudioRecord()
 	{
 		AppLog.i("Start play audio.");
@@ -148,6 +154,7 @@ public class AudioRecorderManager
 		AppLog.i("Play audio success.");
 	}
 
+	// Return buffer.
 	public short[] GetAudioBuffer()
 	{
 		if (buffer == null)
@@ -158,6 +165,7 @@ public class AudioRecorderManager
 		return buffer;
 	}
 
+	// Save feature to a file.
 	public void saveFeatureToFile(final File file)
 	{
 		Thread t = new Thread(new Runnable()
@@ -243,6 +251,7 @@ public class AudioRecorderManager
 
 	}
 
+	// Save audio buffer to a file.
 	public void saveAudioBufferToFile(final File file)
 	{
 		AppLog.i("Start!!!");
@@ -281,7 +290,6 @@ public class AudioRecorderManager
 				{
 					try
 					{
-						AppLog.i("Index = " + i);
 						os.write(buffer[i] + " ");
 					}
 					catch (IOException e)
@@ -305,7 +313,8 @@ public class AudioRecorderManager
 		}).start();
 	}
 
-	public double[][] loadVectorFromFile(File file)
+	// Load feature from file.
+	public double[][] loadFeatureFromFile(File file)
 	{
 		InputStream input;
 		try
@@ -345,6 +354,7 @@ public class AudioRecorderManager
 				index++;
 			} while (line != null);
 
+			reader.close();
 			return featureVector;
 		}
 		catch (IOException e)
@@ -367,11 +377,6 @@ public class AudioRecorderManager
 	// Load audio buffer from file.
 	public void loadAudioBufferFromFile(File file)
 	{
-		if (buffer != null)
-		{
-			return;
-		}
-
 		AppLog.i("loadAudioBufferFromFile start.");
 
 		InputStream input;
@@ -411,6 +416,7 @@ public class AudioRecorderManager
 		AppLog.i("loadAudioBufferFromFile success.");
 	}
 
+	// Release all resource created.
 	public void Destory()
 	{
 		if (audioRecord != null)

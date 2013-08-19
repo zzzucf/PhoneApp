@@ -81,7 +81,7 @@ class SvmRecognizer
 		double[] prob_estimates = new double[classes];
 
 		// TODO: Add comments here.
-		double label = svm.svm_predict_probability(model, nodes, prob_estimates);
+		// double label = svm.svm_predict_probability(model, nodes, prob_estimates);
 
 		// TODO: Add comments here.
 		double estimateValue = Math.max(Math.max(prob_estimates[0], prob_estimates[1]), prob_estimates[2]);

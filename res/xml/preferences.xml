@@ -4,8 +4,14 @@
 
     <CheckBoxPreference 
         android:key="@string/key_enable"
+        android:defaultValue="1"
         android:title="@string/label_enable" />
 
+    <CheckBoxPreference 
+        android:key="@string/key_enable_voice_matching"
+        android:defaultValue="1"
+        android:title="@string/label_enable_voice_matching" />
+    
     <ListPreference
         android:key="@string/key_language"
         android:title="@string/label_language"
