@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.dtw.TimeWarpInfo;
+import com.example.phoneapp.AppLog;
 import com.mfcc.MFCC;
 import com.timeseries.TimeSeries;
 import com.util.DistanceFunction;
@@ -141,7 +142,11 @@ public class voiceMatch
 
 			// double[][] ts2 = new double[sample2.length][];
 			double[][] ts2 = mfcc.doMFCC(sample2, 0.02, 0.01);
-
+			
+			AppLog.i("Checking Arguments....");
+			AppLog.i(Arrays.toString(ts1));
+			AppLog.i(Arrays.toString(ts2));
+			
 			final TimeSeries tsI = new TimeSeries(ts1);
 			final TimeSeries tsJ = new TimeSeries(ts2);
 			final TimeWarpInfo info = com.dtw.FastDTW.getWarpInfoBetween(tsI, tsJ, m_FDtwRadius, m_distFn);

@@ -1,6 +1,7 @@
 package com.example.phoneapp;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
@@ -182,9 +183,32 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	}
 
 	// TODO: Testing buttons.
-	public void predict(View v)
+	public void Record(View v)
 	{
-		Log.i("z", "onclick");
+		AppLog.i("Record !");
 		
+		// Start recording.
+		AudioRecorderManager.getInstance().startAudioRecorder();
+	}
+	
+	short[] buffer;
+	public void Stop(View v)
+	{
+		AppLog.i("Stop !");
+		//buffer = AudioRecorderManager.getInstance().GetAudioBuffer();
+		
+		// Stop recording.
+		AudioRecorderManager.getInstance().stopAudioRecorder();
+	}
+	
+	public void Play(View v)
+	{
+		AudioRecorderManager.getInstance().playAudioRecord();
+	}
+	
+	public void Calculate(View v)
+	{
+		int result = AudioMatchingManager.getInstance().match(buffer);
+		AppLog.i("Result = " + result);
 	}
 }

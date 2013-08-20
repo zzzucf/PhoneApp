@@ -159,11 +159,7 @@ public class AudioRecorderManager
 		short[] tmpBuffer = new short[recordBufferSize];
 		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
 
-		AppLog.i("buffer read result = " + bufferReadResult);
-		buffer = new short[bufferReadResult];
-		System.arraycopy(tmpBuffer, 0, buffer, 0, bufferReadResult);
-
-		return buffer;
+		return tmpBuffer;
 	}
 
 	// Save feature to a file.

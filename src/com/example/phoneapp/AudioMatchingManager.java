@@ -44,9 +44,9 @@ public class AudioMatchingManager
 		declineFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(declineFeatureFile);
 		muteFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(muteFeatureFile);
 
-		AppLog.i("Answer feature = " + answerFeature);
-		AppLog.i("Decline feature = " + declineFeature);
-		AppLog.i("Mute feature = " + muteFeature);
+//		AppLog.i("Answer feature = " + answerFeature);
+//		AppLog.i("Decline feature = " + declineFeature);
+//		AppLog.i("Mute feature = " + muteFeature);
 	}
 
 	public static AudioMatchingManager getInstance()
@@ -69,10 +69,17 @@ public class AudioMatchingManager
 
 		voiceMatch matching = new voiceMatch();
 
+		double test = -1;
+		AppLog.i(test +"");
+		
 		double answerResult = matching.doDtwMatch(answerFeature, buffer);
 		double declineResult = matching.doDtwMatch(declineFeature, buffer);
 		double muteResult = matching.doDtwMatch(muteFeature, buffer);
 
+		AppLog.i("answerResult = " + answerResult);
+		AppLog.i("declineResult = " + declineResult);
+		AppLog.i("muteResult = " + muteResult);
+		
 		double result = Math.max(Math.max(answerResult, declineResult), muteResult);
 
 		AppLog.i("result = " + result);
