@@ -109,6 +109,8 @@ public class AudioRecorderManager
 
 					audioRecord.stop();
 				}
+				
+				AppLog.i("Stop audio record success.");
 			}
 		}).start();
 	}
@@ -154,12 +156,12 @@ public class AudioRecorderManager
 	{
 		playAudioRecord(buffer);
 	}
-	
+
 	// Return buffer.
 	public short[] GetAudioBuffer()
 	{
 		short[] tmpBuffer = new short[recordBufferSize];
-		int bufferReadResult = audioRecord.read(tmpBuffer, 0, recordBufferSize);
+		audioRecord.read(tmpBuffer, 0, recordBufferSize);
 
 		return tmpBuffer;
 	}
@@ -167,13 +169,19 @@ public class AudioRecorderManager
 	// Save feature to a file.
 	public void saveFeatureToFile(final File file)
 	{
+		if (buffer == null)
+		{
+			AppLog.i("buffer is null, not going to save in file.");
+			return;
+		}
+
+		saveFeatureSuccess = false;
+
 		Thread t = new Thread(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				saveFeatureSuccess = false;
-
 				while (audioRecord.getRecordingState() != AudioRecord.RECORDSTATE_STOPPED)
 				{
 					try
@@ -243,13 +251,30 @@ public class AudioRecorderManager
 			}
 		});
 		t.start();
-		
+
+		while (saveFeatureSuccess)
+		{
+			try
+			{
+				Thread.sleep(200);
+			} catch (InterruptedException e)
+			{
+				AppLog.e(e.getMessage());
+			}
+		}
+
 		AudioMatchingManager.getInstance().UpdateFeatures();
 	}
 
 	// Save audio buffer to a file.
 	public void saveAudioBufferToFile(final File file)
 	{
+		if (buffer == null)
+		{
+			AppLog.i("buffer is null, not going to save in file.");
+			return;
+		}
+
 		AppLog.i("Start!!!");
 		new Thread(new Runnable()
 		{
@@ -305,10 +330,17 @@ public class AudioRecorderManager
 		}).start();
 	}
 
-	// Load feature from file.
+
 	public double[][] loadFeatureFromFile(File file)
 	{
 		AppLog.i("Start loading feature " + file.getName() + ".");
+		
+		if(file.length() == 0)
+		{
+			AppLog.e("File is empty.");
+			return null;
+		}
+		
 		InputStream input;
 		try
 		{
@@ -341,7 +373,7 @@ public class AudioRecorderManager
 				{
 					break;
 				}
-				
+
 				String[] data = line.split(" ");
 				for (int i = 0; i < data.length; ++i)
 				{
@@ -373,6 +405,12 @@ public class AudioRecorderManager
 	{
 		AppLog.i("loadAudioBufferFromFile start.");
 
+		if(file.length() == 0)
+		{
+			AppLog.e("File is empty.");
+			return;
+		}
+		
 		InputStream input;
 		try
 		{

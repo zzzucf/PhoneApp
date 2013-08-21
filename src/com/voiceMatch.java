@@ -36,6 +36,18 @@ public class VoiceMatch
 
 	public double doDtwMatch(double[][] feature, short[] audio)
 	{
+		if (feature == null)
+		{
+			AppLog.i("Feature is null.");
+			return -1;
+		}
+		
+		if (audio == null)
+		{
+			AppLog.i("Audio is null.");
+			return -1;
+		}
+		
 		ArrayList<Double> arrList2 = new ArrayList<Double>();
 		if (mfcc.preprocess(audio, arrList2) > 0)
 		{

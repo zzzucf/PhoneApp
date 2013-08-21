@@ -21,24 +21,14 @@ public class AudioMatchingManager
 
 	private AudioMatchingManager()
 	{
-		File answerFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.ANSWER_FEATURE_FILE_NAME);
-		File declineFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.DECLINE_FEATURE_FILE_NAME);
-		File muteFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.MUTE_FEATURE_FILE_NAME);
-
-		answerFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(answerFeatureFile);
-		declineFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(declineFeatureFile);
-		muteFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(muteFeatureFile);
-
-		AppLog.i("Answer feature = " + answerFeature);
-		AppLog.i("Decline feature = " + declineFeature);
-		AppLog.i("Mute feature = " + muteFeature);
+		UpdateFeatures();
 	}
 
 	public void UpdateFeatures()
 	{
-		File answerFeatureFile = FileManager.openFile(FileManager.ROOT_FOLDER_NAME, FileManager.ANSWER_FEATURE_FILE_NAME);
-		File declineFeatureFile = FileManager.openFile(FileManager.ROOT_FOLDER_NAME, FileManager.DECLINE_FEATURE_FILE_NAME);
-		File muteFeatureFile = FileManager.openFile(FileManager.ROOT_FOLDER_NAME, FileManager.MUTE_FEATURE_FILE_NAME);
+		File answerFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.ANSWER_FEATURE_FILE_NAME);
+		File declineFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.DECLINE_FEATURE_FILE_NAME);
+		File muteFeatureFile = FileManager.openFileInFolder(FileManager.ROOT_FOLDER_NAME, FileManager.MUTE_FEATURE_FILE_NAME);
 
 		answerFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(answerFeatureFile);
 		declineFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(declineFeatureFile);
