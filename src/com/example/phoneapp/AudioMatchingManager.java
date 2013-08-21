@@ -2,7 +2,7 @@ package com.example.phoneapp;
 
 import java.io.File;
 
-import com.voiceMatch;
+import com.VoiceMatch;
 
 public class AudioMatchingManager
 {
@@ -12,7 +12,7 @@ public class AudioMatchingManager
 	private static double[][] declineFeature;
 	private static double[][] muteFeature;
 
-	private final double threshold = 0.2;
+	private final double threshold = 500;
 
 	public final static int RESULT_NONE = -1;
 	public final static int RESULT_ANSWER = 0;
@@ -43,10 +43,6 @@ public class AudioMatchingManager
 		answerFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(answerFeatureFile);
 		declineFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(declineFeatureFile);
 		muteFeature = AudioRecorderManager.getInstance().loadFeatureFromFile(muteFeatureFile);
-
-//		AppLog.i("Answer feature = " + answerFeature);
-//		AppLog.i("Decline feature = " + declineFeature);
-//		AppLog.i("Mute feature = " + muteFeature);
 	}
 
 	public static AudioMatchingManager getInstance()
@@ -67,7 +63,7 @@ public class AudioMatchingManager
 			return RESULT_NONE;
 		}
 
-		voiceMatch matching = new voiceMatch();
+		VoiceMatch matching = new VoiceMatch();
 
 		double test = -1;
 		AppLog.i(test +"");
@@ -80,7 +76,7 @@ public class AudioMatchingManager
 		AppLog.i("declineResult = " + declineResult);
 		AppLog.i("muteResult = " + muteResult);
 		
-		double result = Math.max(Math.max(answerResult, declineResult), muteResult);
+		double result = Math.min(Math.min(answerResult, declineResult), muteResult);
 
 		AppLog.i("result = " + result);
 

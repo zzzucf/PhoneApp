@@ -11,7 +11,7 @@ import com.timeseries.TimeSeries;
 import com.util.DistanceFunction;
 import com.util.DistanceFunctionFactory;
 
-public class voiceMatch
+public class VoiceMatch
 {
 	private final boolean m_typeofmatch; // if 'true', matching is done in mfcc
 	private final int m_FDtwRadius; // search radius for fast DTW
@@ -19,12 +19,12 @@ public class voiceMatch
 	private final DistanceFunction m_distFn; // distance function for DTW
 	private final MFCC mfcc;
 
-	public voiceMatch()
+	public VoiceMatch()
 	{
 		this(false, 13, 8000, 24, 256, 10, "EuclideanDistance");
 	}
 
-	public voiceMatch(boolean typeofmatch, int nMFCCs, double fs, int nFilters, int FFTlength, int radius, String distFn)
+	public VoiceMatch(boolean typeofmatch, int nMFCCs, double fs, int nFilters, int FFTlength, int radius, String distFn)
 	{
 		m_typeofmatch = typeofmatch;
 		m_featurenum = nMFCCs;
@@ -50,16 +50,25 @@ public class voiceMatch
 				sample2[i] = arrList2.get(i);
 			}
 			double[][] ts1 = new double[feature.length][m_featurenum];
+			
+			AppLog.i("m_featurenum = " + m_featurenum);
+			
 			for (int i = 0; i < feature.length; ++i)
 			{
-				ts1[i] = Arrays.copyOfRange(feature[i], 0, m_featurenum - 1);
+				ts1[i] = Arrays.copyOfRange(feature[i], 0, m_featurenum);
 			}
 
-			// double[][] ts2 = new double[sample2.length][];
 			double[][] ts2 = mfcc.doMFCC(sample2, 0.02, 0.01);
-
+			
+			AppLog.i(ts1.length + " || " + ts1[0].length);
+			AppLog.i(ts2.length + " || " + ts2[0].length);
+			
 			final TimeSeries tsI = new TimeSeries(ts1);
 			final TimeSeries tsJ = new TimeSeries(ts2);
+			
+			AppLog.i("tsI measurement vector length = " + tsI.getMeasurementVector(0).length);
+			AppLog.i("tsJ measurement vector length = " + tsJ.getMeasurementVector(0).length);
+			
 			final TimeWarpInfo info = com.dtw.DTW.getWarpInfoBetween(tsI, tsJ, m_distFn);
 
 			return info.getDistance();

@@ -7,10 +7,12 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 
 import Enums.ActionEnum;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -32,7 +34,9 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 
 		// Init svm
 		// initSvm();
-
+		
+		setMediaVolume();
+		
 		// Add fragment to record a audio and play a audio.
 		addActionFragment(ActionEnum.Answer);
 		addActionFragment(ActionEnum.Decline);
@@ -133,7 +137,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 			unregisterPhoneBroadcastReceiver();
 		}
 	}
-	
+
 	public void onLanguageChange(SharedPreferences sharedPreferences)
 	{
 		String language = sharedPreferences.getString(getString(R.string.key_language), "");
@@ -158,6 +162,15 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 		Intent intent = getIntent();
 		finish();
 		startActivity(intent);
+	}
+
+	// TODO: add parameter for this function.
+	public void setMediaVolume()
+	{
+		AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) (maxVolume*0.8), AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
 	}
 
 	// TODO: Change svm to service.
@@ -186,26 +199,27 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	public void Record(View v)
 	{
 		AppLog.i("Record !");
-		
+
 		// Start recording.
 		AudioRecorderManager.getInstance().startAudioRecorder();
 	}
-	
+
 	short[] buffer;
+
 	public void Stop(View v)
 	{
 		AppLog.i("Stop !");
-		//buffer = AudioRecorderManager.getInstance().GetAudioBuffer();
-		
+		buffer = AudioRecorderManager.getInstance().GetAudioBuffer();
+
 		// Stop recording.
 		AudioRecorderManager.getInstance().stopAudioRecorder();
 	}
-	
+
 	public void Play(View v)
 	{
-		AudioRecorderManager.getInstance().playAudioRecord();
+		AudioRecorderManager.getInstance().playAudioRecord(buffer);
 	}
-	
+
 	public void Calculate(View v)
 	{
 		int result = AudioMatchingManager.getInstance().match(buffer);

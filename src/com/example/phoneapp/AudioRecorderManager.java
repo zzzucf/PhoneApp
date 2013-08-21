@@ -48,8 +48,6 @@ public class AudioRecorderManager
 
 		audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, frequency, channelConfiguration, audioEncoding, recordBufferSize);
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, frequency, channelConfiguration, audioEncoding, playBufferSize, AudioTrack.MODE_STREAM);
-
-		audioTrack.setStereoVolume(0.8f, 0.8f);
 	}
 
 	// Singleton get instance object.
@@ -116,7 +114,7 @@ public class AudioRecorderManager
 	}
 
 	// Play audio buffer.
-	public void playAudioRecord()
+	public void playAudioRecord(short[] data)
 	{
 		AppLog.i("Start play audio.");
 
@@ -126,7 +124,7 @@ public class AudioRecorderManager
 			return;
 		}
 
-		if (buffer == null)
+		if (data == null)
 		{
 			AppLog.e("Cannot play audio record because audioTrack does not have data.");
 			return;
@@ -144,15 +142,19 @@ public class AudioRecorderManager
 			}
 		}
 
-		audioTrack.setStereoVolume(0.8f, 0.8f);
 		audioTrack.flush();
 		audioTrack.play();
-		audioTrack.write(buffer, 0, buffer.length);
+		audioTrack.write(data, 0, data.length);
 		audioTrack.stop();
 
 		AppLog.i("Play audio success.");
 	}
 
+	public void playAudioRecord()
+	{
+		playAudioRecord(buffer);
+	}
+	
 	// Return buffer.
 	public short[] GetAudioBuffer()
 	{
