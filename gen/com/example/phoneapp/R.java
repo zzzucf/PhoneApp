@@ -37,6 +37,7 @@ public final class R {
         public static final int button3=0x7f0a0007;
         public static final int button4=0x7f0a0008;
         public static final int preferenceFragmentContainer=0x7f0a0003;
+        public static final int result=0x7f0a0009;
     }
     public static final class layout {
         public static final int action_fragment=0x7f030000;

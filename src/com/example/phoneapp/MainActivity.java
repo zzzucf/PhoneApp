@@ -22,6 +22,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnSharedPreferenceChangeListener
 {
@@ -224,5 +225,7 @@ public class MainActivity extends Activity implements OnSharedPreferenceChangeLi
 	{
 		int result = AudioMatchingManager.getInstance().match(buffer);
 		AppLog.i("Result = " + result);
+		TextView tv = (TextView)findViewById(R.id.result);
+		tv.setText("result = " + result);
 	}
 }
